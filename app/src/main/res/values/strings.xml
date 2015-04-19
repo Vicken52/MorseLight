@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MorseLight</string>
+    <string name="Signal">Signal</string>
+    <string name="Default">Please enter a phrase above to be converted to Morse Code.</string>
+    <string name="action_settings">Settings</string>
+</resources>
