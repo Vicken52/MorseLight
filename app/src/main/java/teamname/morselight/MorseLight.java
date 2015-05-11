@@ -12,11 +12,16 @@ import android.widget.TextView;
 
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
-    private EditText plain = (EditText)findViewById(R.id.PlainText);
-    private TextView morse = (TextView)findViewById(R.id.MorseCode);
+    private EditText plain;
+    private TextView morse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_morse_light);
+
+        plain = (EditText)findViewById(R.id.PlainText);
+        morse = (TextView)findViewById(R.id.MorseCode);
         input = new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -29,7 +34,6 @@ public class MorseLight extends ActionBarActivity {
             @Override
             public void afterTextChanged(Editable s) { }
         };
-
         plain.addTextChangedListener(input);
     }
 
