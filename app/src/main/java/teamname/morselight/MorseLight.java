@@ -1,5 +1,7 @@
 package teamname.morselight;
 
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,7 +15,8 @@ import android.widget.TextView;
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
     private EditText plain;
-    private TextView morse;
+    private TextView morse, decode;
+    final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +25,18 @@ public class MorseLight extends ActionBarActivity {
 
         plain = (EditText)findViewById(R.id.PlainText);
         morse = (TextView)findViewById(R.id.MorseCode);
+        decode = (TextView) findViewById(R.id.MorseCodeDecode);
+
+        //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                MorseCode code = new MorseCode();
+                String result = code.encode(plain.getText().toString());
+                morse.setText(result);
+                decode.setText(code.decode(result));
+
+
 
             }
 
@@ -32,7 +44,9 @@ public class MorseLight extends ActionBarActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {
+                tg.startTone(ToneGenerator.TONE_DTMF_A, 250);
+            }
         };
         plain.addTextChangedListener(input);
     }

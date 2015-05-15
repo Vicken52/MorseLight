@@ -14,13 +14,13 @@ import java.util.Map;
 public class MorseCode {
     private static final String[] alphabets = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
                                     "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-                                    "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+                                    "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", " "};
     private static  final String[] morses = {".-", "-...", "-.-.", "-..", ".", "..-.", "--.",
                                     "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.",
                                     "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-",
                                     "-.--", "--..", ".----", "..---", "...--", "....-", ".....",
-                                    "-....", "--...", "---..", "----.", "-----"};
-    private static final Map<String, String> ALPHABET_MAP, MORSE_MAP;
+                                    "-....", "--...", "---..", "----.", "-----", "/"};
+    private static Map<String, String> ALPHABET_MAP, MORSE_MAP;
 
     // Initialize 2 maps
     static {
@@ -41,12 +41,12 @@ public class MorseCode {
         if (str != null || !str.isEmpty())
             for (int i = 0; i < str.length(); i++){
                 // check for A-Z and 0-9
-                if ((str.charAt(i) >= 'A' && str.charAt(i) <= 'Z') || (str.charAt(i) >= '0' && str.charAt(i) <= '9')){
+                if ((str.charAt(i) >= 'A' && str.charAt(i) <= 'Z') || (str.charAt(i) >= '0' && str.charAt(i) <= '9') || str.charAt(i) == ' '){
                     tmp = "" + str.charAt(i);	// must convert from char to String for map.get() method to work
                     //System.out.println("working on: " + tmp);
                     ///System.out.println("found in map: "+ ALPHABET_MAP.get(tmp));
                     //System.out.println("Test A: "+ ALPHABET_MAP.get("A"));
-                    result += ALPHABET_MAP.get(tmp) + " ";
+                    result += ALPHABET_MAP.get(tmp) + "   ";
                 }
             }
         return result;
@@ -57,7 +57,7 @@ public class MorseCode {
     public static String decode(String str){
         String result = "";
         if (str != null || !str.isEmpty()){
-            String[] tmp = str.split(" ");
+            String[] tmp = str.split("   ");
             for (String s: tmp)
                 result +=MORSE_MAP.get(s);
         }
