@@ -1,7 +1,14 @@
 package teamname.morselight;
 
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.BatteryManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,13 +25,38 @@ public class MorseLight extends ActionBarActivity {
     private TextView morse, decode;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
+    // Detect low battery level and create a DialogInterface warning
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            if (batteryLevel <= 10) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Battery is low. " + batteryLevel
+                        + "% of battery remaining. "
+                        + "The flash is disabled. Please charge the device.");
+                builder.setCancelable(true);
+                builder.setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_morse_light);
 
         plain = (EditText)findViewById(R.id.PlainText);
-        morse = (TextView)findViewById(R.id.MorseCode);
+        morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
@@ -35,9 +67,6 @@ public class MorseLight extends ActionBarActivity {
                 String result = code.encode(plain.getText().toString());
                 morse.setText(result);
                 decode.setText(code.decode(result));
-
-
-
             }
 
             @Override
@@ -49,6 +78,9 @@ public class MorseLight extends ActionBarActivity {
             }
         };
         plain.addTextChangedListener(input);
+
+        // Display the low battery warning DialogInterface
+        this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
 
