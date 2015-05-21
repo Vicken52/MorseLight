@@ -101,6 +101,9 @@ public class MorseLight extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if (id == R.id.sound_setting){
+            Intent intent = new Intent(MorseLight.this, AudioActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

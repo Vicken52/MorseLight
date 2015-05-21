@@ -3,4 +3,7 @@
     <string name="Signal">Signal</string>
     <string name="Default">Please enter a phrase above to be converted to Morse Code.</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_audio">AudioActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
