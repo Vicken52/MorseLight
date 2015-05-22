@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MorseLight extends ActionBarActivity {
@@ -32,8 +33,10 @@ public class MorseLight extends ActionBarActivity {
     private TextView morse, decode;
     private Button button;
     private String encode = "";
+    private AudioManager aManager = null;
+    private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-    private MediaPlayer b = null, l = null, p = null;
+    private MediaPlayer b = null, l = null;
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
@@ -69,10 +72,12 @@ public class MorseLight extends ActionBarActivity {
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
         button = (Button) findViewById(R.id.button);
+        button.requestFocus();
+        aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        volume = (float) aManager.getStreamVolume(AudioManager.STREAM_RING);
 
         createBeep();
         createLongBeep();
-        createPause();
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
@@ -103,12 +108,16 @@ public class MorseLight extends ActionBarActivity {
                 if (!text.isEmpty()){
                     MorseCode code = new MorseCode();
                     encode = code.encode(text);
-                    long duration = 0;
-                    new Thread(new Runnable(){
-                        public void run() {
-                            playSounds(encode);
-                        }
-                    }).start();
+                    if (aManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                        long duration = 0;
+                        new Thread(new Runnable() {
+                            public void run() {
+                                playSounds(encode);
+                            }
+                        }).start();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG);
+                    }
                 }
             }
         });
@@ -120,6 +129,7 @@ public class MorseLight extends ActionBarActivity {
     public void playSounds(String text){
         int delay = 0;
         float maxVol = 10*.01f;
+        maxVol = (float) aManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
         for(int i = 0; i < text.length(); i++){
             if(b.isPlaying() || l.isPlaying()){
                 i--;
@@ -140,11 +150,6 @@ public class MorseLight extends ActionBarActivity {
         }
     }
 
-    Runnable stopPlayerTask = new Runnable(){
-        @Override
-        public void run() {
-            p.stop();
-        }};
     public void createBeep() {
         float maxVol = 75*.01f;
         try {
@@ -157,24 +162,6 @@ public class MorseLight extends ActionBarActivity {
             b.prepare();
             b.setVolume(maxVol, maxVol);
             b.setLooping(false);
-            //b.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createPause(){
-        float maxVol = 75*.01f;
-        try {
-            p = new MediaPlayer();
-
-            AssetFileDescriptor descriptor = getAssets().openFd("pause.wav");
-            p.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
-            descriptor.close();
-
-            p.prepare();
-            p.setVolume(maxVol, maxVol);
-            p.setLooping(false);
             //b.start();
         } catch (Exception e) {
             e.printStackTrace();
