@@ -105,7 +105,7 @@ public class MorseLight extends ActionBarActivity {
             public void onClick(View v) {
                 String text = plain.getText().toString().trim();
                 encode = "";
-                if (!text.isEmpty()){
+                if (!text.isEmpty()) {
                     MorseCode code = new MorseCode();
                     encode = code.encode(text);
                     if (aManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
@@ -115,8 +115,8 @@ public class MorseLight extends ActionBarActivity {
                                 playSounds(encode);
                             }
                         }).start();
-                    }else{
-                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -141,9 +141,6 @@ public class MorseLight extends ActionBarActivity {
                     l.setVolume(maxVol, maxVol);
                     l.start();
                 }else if (text.charAt(i) == '/'){
-                    //p.seekTo(0);
-                    //p.start();
-                    //delay = 2000;
                     SystemClock.sleep(750);
                 }
             }
