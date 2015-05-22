@@ -6,15 +6,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -23,7 +29,9 @@ public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
     private EditText plain;
     private TextView morse, decode;
+    private Button button;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+    private MediaPlayer b = null, l = null, p = null;
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
@@ -58,6 +66,11 @@ public class MorseLight extends ActionBarActivity {
         plain = (EditText)findViewById(R.id.PlainText);
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
+        button = (Button) findViewById(R.id.button);
+
+        createBeep();
+        createLongBeep();
+        createPause();
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
@@ -74,13 +87,118 @@ public class MorseLight extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                tg.startTone(ToneGenerator.TONE_DTMF_A, 250);
+                //tg.startTone(ToneGenerator.TONE_DTMF_A, 250);
+                //b.start();
             }
         };
         plain.addTextChangedListener(input);
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = plain.getText().toString().trim();
+                if (!text.isEmpty()){
+                    MorseCode code = new MorseCode();
+                    String encode = code.encode(text);
+                    playSounds(encode);
+                }
+            }
+        });
+
         // Display the low battery warning DialogInterface
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    public void playSounds(String text){
+        int delay = 0;
+        float maxVol = 50*.01f;
+        for(int i = 0; i < text.length(); i++){
+            if(b.isPlaying() || l.isPlaying() || p.isPlaying()){
+                if(p.isPlaying()) {
+                    Log.i("pause", "HERE IS THE CURRENT PLAY: " + p.getCurrentPosition());
+                    if (p.getCurrentPosition() >= delay) {
+                        p.stop();
+                        p.seekTo(0);
+                    }
+                }
+                i--;
+            }else{
+                if(text.charAt(i) == '.'){
+                    b.setVolume(maxVol, maxVol);
+                    b.start();
+                }else if (text.charAt(i) == '-'){
+                    l.setVolume(maxVol, maxVol);
+                    l.start();
+                }else if (text.charAt(i) == '/'){
+                    p.seekTo(0);
+                    p.start();
+                    delay = 2000;
+                }else{
+                    p.seekTo(0);
+                    p.start();
+                    delay = 2000;
+                }
+            }
+        }
+    }
+
+    Runnable stopPlayerTask = new Runnable(){
+        @Override
+        public void run() {
+            p.stop();
+        }};
+    public void createBeep() {
+        float maxVol = 75*.01f;
+        try {
+            b = new MediaPlayer();
+
+            AssetFileDescriptor descriptor = getAssets().openFd("censor-beep-1.mp3");
+            b.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+            descriptor.close();
+
+            b.prepare();
+            b.setVolume(maxVol, maxVol);
+            b.setLooping(false);
+            //b.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createPause(){
+        float maxVol = 75*.01f;
+        try {
+            p = new MediaPlayer();
+
+            AssetFileDescriptor descriptor = getAssets().openFd("pause.wav");
+            p.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+            descriptor.close();
+
+            p.prepare();
+            p.setVolume(maxVol, maxVol);
+            p.setLooping(false);
+            //b.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createLongBeep() {
+        float maxVol = 75*.01f;
+        try {
+            l = new MediaPlayer();
+
+            AssetFileDescriptor descriptor = getAssets().openFd("censor-beep-3.wav");
+            l.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+            descriptor.close();
+
+            l.prepare();
+            l.setVolume(maxVol, maxVol);
+            l.setLooping(false);
+            //l.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
