@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -30,6 +31,7 @@ public class MorseLight extends ActionBarActivity {
     private EditText plain;
     private TextView morse, decode;
     private Button button;
+    private String encode = "";
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null, p = null;
 
@@ -97,10 +99,16 @@ public class MorseLight extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String text = plain.getText().toString().trim();
+                encode = "";
                 if (!text.isEmpty()){
                     MorseCode code = new MorseCode();
-                    String encode = code.encode(text);
-                    playSounds(encode);
+                    encode = code.encode(text);
+                    long duration = 0;
+                    new Thread(new Runnable(){
+                        public void run() {
+                            playSounds(encode);
+                        }
+                    }).start();
                 }
             }
         });
@@ -111,16 +119,9 @@ public class MorseLight extends ActionBarActivity {
 
     public void playSounds(String text){
         int delay = 0;
-        float maxVol = 50*.01f;
+        float maxVol = 10*.01f;
         for(int i = 0; i < text.length(); i++){
-            if(b.isPlaying() || l.isPlaying() || p.isPlaying()){
-                if(p.isPlaying()) {
-                    Log.i("pause", "HERE IS THE CURRENT PLAY: " + p.getCurrentPosition());
-                    if (p.getCurrentPosition() >= delay) {
-                        p.stop();
-                        p.seekTo(0);
-                    }
-                }
+            if(b.isPlaying() || l.isPlaying()){
                 i--;
             }else{
                 if(text.charAt(i) == '.'){
@@ -130,13 +131,10 @@ public class MorseLight extends ActionBarActivity {
                     l.setVolume(maxVol, maxVol);
                     l.start();
                 }else if (text.charAt(i) == '/'){
-                    p.seekTo(0);
-                    p.start();
-                    delay = 2000;
-                }else{
-                    p.seekTo(0);
-                    p.start();
-                    delay = 2000;
+                    //p.seekTo(0);
+                    //p.start();
+                    //delay = 2000;
+                    SystemClock.sleep(750);
                 }
             }
         }
