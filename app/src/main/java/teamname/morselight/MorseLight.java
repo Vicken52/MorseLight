@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
@@ -23,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +39,9 @@ public class MorseLight extends ActionBarActivity {
     private Button button;
     private String encode = "";
     private AudioManager aManager = null;
+    private Camera mCamera;
+    private CameraPreview mPreview;
+    private boolean cameraFront = false;
     private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null;
@@ -61,6 +69,55 @@ public class MorseLight extends ActionBarActivity {
             }
         }
     };
+    private int findFrontFacingCamera(){
+        int cameraId = -1;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for(int i = 0; i < numberOfCameras; i++){
+            CameraInfo info = new CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if(info.facing == CameraInfo.CAMERA_FACING_FRONT){
+                cameraId = i;
+                cameraFront = true;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
+    private int findBackFacingCamear(){
+        int cameraId = -1;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for(int i = 0; i < numberOfCameras; i++){
+            CameraInfo info = new CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if(info.facing == CameraInfo.CAMERA_FACING_BACK){
+                cameraId = i;
+                cameraFront = false;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
+    private boolean checkCameraHardware(Context context){
+        if(context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try{
+            c = Camera.open();
+            Camera.Parameters param = c.getParameters();
+            Log.v("param", param.toString());
+        } catch(Exception e){
+
+        }
+        return c;
+    }
 
 
     @Override
@@ -78,6 +135,15 @@ public class MorseLight extends ActionBarActivity {
 
         createBeep();
         createLongBeep();
+
+        if (checkCameraHardware(this.getApplicationContext())){
+            mCamera = getCameraInstance();
+            mPreview = new CameraPreview(this, mCamera);
+            FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
+            preview.addView(mPreview);
+        }else{
+            Log.v("CAMERA", "did not load the camera");
+        }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
