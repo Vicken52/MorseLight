@@ -13,20 +13,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.IOException;
 
+import java.util.Calendar;
+
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
 
 public class AudioActivity extends ActionBarActivity {
 
     private String fileName;
-    private Button recordButton, playButton;
+    private Button recordButton, playButton, detectButton;
 
     private MediaRecorder recorder;
     private MediaPlayer player;
     private boolean isRecording, isPlaying;
 
-
+    /*==================================================
+    * Detecting beep sound using TarsosDSP
+    *
+     ====================================================*/
+    long startTime, endTime, currentTime, duration, silenceStart, silenceDuration;
+    float pitch, threshold;
+    boolean gotSound, isDetecting;
+    AudioDispatcher dispatcher;
+    PitchDetectionHandler pdh;
+    AudioProcessor p;
     private  void onRecord(){
         if (isRecording) {
             recordButton.setText("Start Recording");
@@ -91,6 +110,59 @@ public class AudioActivity extends ActionBarActivity {
         player = null;
     }
 
+    private void onDetecting(){
+        if (!isDetecting) {
+            detectButton.setText("STOP DETECTING");
+            isDetecting = true;
+            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
+            pitch = -1;
+            threshold = 900;
+            duration = 0;
+            gotSound = false;
+            silenceStart = Calendar.getInstance().getTimeInMillis();
+            pdh = new PitchDetectionHandler() {
+                @Override
+                public void handlePitch(PitchDetectionResult result, AudioEvent e) {
+                    final float pitchInHz = result.getPitch();
+                    if ((pitchInHz > threshold) && !gotSound) {
+                        startTime = Calendar.getInstance().getTimeInMillis();
+                        silenceDuration = startTime - silenceStart;
+                        gotSound = true;
+                    } else if ((pitchInHz < threshold) && gotSound) {
+                        currentTime = Calendar.getInstance().getTimeInMillis();
+                        duration = currentTime - startTime;
+                        startTime = currentTime;
+                        gotSound = false;
+                        silenceStart = currentTime;
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView text = (TextView) findViewById(R.id.pitchTv);
+                            text.setText("Pitch (Hz): " + pitchInHz);
+                            if (!gotSound) {
+                                TextView tv = (TextView) findViewById(R.id.soundTv);
+                                tv.setText("Sound duration: " + duration);
+                            } else {
+                                TextView tv = (TextView) findViewById(R.id.silenceTv);
+                                tv.setText("Silence duration" + silenceDuration);
+                            }
+                        }
+                    });
+                }
+            };
+            p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+            dispatcher.addAudioProcessor(p);
+            new Thread(dispatcher, "Audio Dispatcher").start();
+        }else{
+            isDetecting = false;
+            detectButton.setText("START DETECTING");
+            if (dispatcher != null)
+                dispatcher.removeAudioProcessor(p);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,9 +171,11 @@ public class AudioActivity extends ActionBarActivity {
         fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio.3gp";
         isPlaying = false;
         isRecording = false;
+        isDetecting = false;
         // get buttons
         recordButton = (Button)findViewById(R.id.recordB);
         playButton = (Button)findViewById(R.id.playB);
+        detectButton = (Button)findViewById(R.id.detectB);
 
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +188,13 @@ public class AudioActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 onPlaying();
+            }
+        });
+
+        detectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDetecting();
             }
         });
     }
