@@ -27,47 +27,53 @@
          The most common distress signal is SOS or three dots, three dashes and three dots, internationally recognized by treaty.
     </string>
     <string name="title_activity_help2">Morse Code Chart</string>
-       <string name="help2_text">1. The length of a dot is a one unit.
+    <string name="help2_text">1. The length of a dot is a one unit.
         \n2. A dash is three units.
         \n3. The space between parts of the same letter is one unit.
         \n4. The space between letters is three units.
         \n5. The space between words is seven units.
-        <p><b>\n\nA  .-
-        \nB  -...
-        \nC  -.-.
-        \nD  -..
-        \nE  .
-        \nF  ..-.
-        \nG  --.
-        \nH  ....
-        \nI  ..
-        \nJ  .---
-        \nK  -.-
-        \nL  .-..
-        \nM  --
-        \nN  -.
-        \nO  ---
-        \nP  .--.
-        \nQ  --.-
-        \nR  .-.
-        \nS  ...
-        \nT  -
-        \nU  ..-
-        \nV  ...-
-        \nW  .--
-        \nX  -..-
-        \nY  -.--
-        \nZ  --..
-        \n1  .----
-        \n2  ..---
-        \n3  ...--
-        \n4  ....-
-        \n5  .....
-        \n6  -....
-        \n7  --...
-        \n8  ---..
-        \n9  ----.
-        \n0  -----</b></p>
+        <p><b>\n\nA\t\t.-
+        \nB\t\t-...
+        \nC\t\t-.-.
+        \nD\t\t-..
+        \nE\t\t.
+        \nF\t\t..-.
+        \nG\t\t--.
+        \nH\t\t....
+        \nI\t\t..
+        \nJ\t\t.---
+        \nK\t\t-.-
+        \nL\t\t.-..
+        \nM\t\t--
+        \nN\t\t-.
+        \nO\t\t---
+        \nP\t\t.--.
+        \nQ\t\t--.-
+        \nR\t\t.-.
+        \nS\t\t...
+        \nT\t\t-
+        \nU\t\t..-
+        \nV\t\t...-
+        \nW\t\t.--
+        \nX\t\t-..-
+        \nY\t\t-.--
+        \nZ\t\t--..
+        \n1\t\t.----
+        \n2\t\t..---
+        \n3\t\t...--
+        \n4\t\t....-
+        \n5\t\t.....
+        \n6\t\t-....
+        \n7\t\t--...
+        \n8\t\t---..
+        \n9\t\t----.
+        \n0\t\t-----
+        \nSpace\t\t/
+        \n.\t\t.-.-.-
+        \n,\t\t--..--
+        \n?\t\t..--..
+        \n/\t\t-..-.
+        \n@\t\t.--.-</b></p>
     </string>
     <string name="title_activity_help3">How to Use MorseLight</string>
     <string name="help3_text">1. Input your message in the text box.
