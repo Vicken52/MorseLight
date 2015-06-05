@@ -134,7 +134,9 @@ public class MorseLight extends ActionBarActivity {
                     //p.seekTo(0);
                     //p.start();
                     //delay = 2000;
-                    SystemClock.sleep(750);
+                    SystemClock.sleep(500);
+                }else if (text.charAt(i) == ' '){
+                    SystemClock.sleep(300);
                 }
             }
         }
