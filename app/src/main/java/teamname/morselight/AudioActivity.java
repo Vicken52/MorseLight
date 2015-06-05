@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class AudioActivity extends ActionBarActivity {
      ====================================================*/
     long startTime, endTime, currentTime, duration, silenceStart, silenceDuration;
     float pitch, threshold;
-    boolean gotSound, isDetecting;
+    boolean gotSound, isDetecting, needUIUpdate;
     AudioDispatcher dispatcher;
     PitchDetectionHandler pdh;
     AudioProcessor p;
@@ -128,28 +129,34 @@ public class AudioActivity extends ActionBarActivity {
                         startTime = Calendar.getInstance().getTimeInMillis();
                         silenceDuration = startTime - silenceStart;
                         gotSound = true;
+                        needUIUpdate = true;
                     } else if ((pitchInHz < threshold) && gotSound) {
                         currentTime = Calendar.getInstance().getTimeInMillis();
                         duration = currentTime - startTime;
                         startTime = currentTime;
                         gotSound = false;
                         silenceStart = currentTime;
+                        needUIUpdate = true;
                     }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView text = (TextView) findViewById(R.id.pitchTv);
-                            text.setText("Pitch (Hz): " + pitchInHz);
-                            if (!gotSound) {
-                                TextView tv = (TextView) findViewById(R.id.soundTv);
-                                tv.setText("Sound duration: " + duration);
-                            } else {
-                                TextView tv = (TextView) findViewById(R.id.silenceTv);
-                                tv.setText("Silence duration" + silenceDuration);
+                    if (needUIUpdate) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView text = (TextView) findViewById(R.id.pitchTv);
+                                text.setText("Pitch (Hz): " + pitchInHz);
+                                if (!gotSound) {
+                                    TextView tv = (TextView) findViewById(R.id.soundTv);
+                                    tv.setText("Sound duration: " + duration);
+                                    EditText morseEt = (EditText) findViewById(R.id.morseEt);
+                                    morseEt.append(beepToMorse(duration));
+                                } else {
+                                    TextView tv = (TextView) findViewById(R.id.silenceTv);
+                                    tv.setText("Silence duration" + silenceDuration);
+                                }
+                                needUIUpdate = false;
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             };
             p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
@@ -172,6 +179,7 @@ public class AudioActivity extends ActionBarActivity {
         isPlaying = false;
         isRecording = false;
         isDetecting = false;
+        needUIUpdate = false;
         // get buttons
         recordButton = (Button)findViewById(R.id.recordB);
         playButton = (Button)findViewById(R.id.playB);
@@ -199,6 +207,13 @@ public class AudioActivity extends ActionBarActivity {
         });
     }
 
+    private String beepToMorse(long ms){
+        if (ms > 180l && ms < 300l)
+            return ".";
+        else if (ms > 900l && ms < 1150l)
+            return "-";
+        return "";
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
