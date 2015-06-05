@@ -31,11 +31,9 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 public class AudioActivity extends ActionBarActivity {
 
     private String fileName;
-    private Button recordButton, playButton, detectButton;
+    private Button detectButton;
 
-    private MediaRecorder recorder;
-    private MediaPlayer player;
-    private boolean isRecording, isPlaying;
+    private TextView decodedMessage;
 
     /*==================================================
     * Detecting beep sound using TarsosDSP
@@ -47,73 +45,15 @@ public class AudioActivity extends ActionBarActivity {
     AudioDispatcher dispatcher;
     PitchDetectionHandler pdh;
     AudioProcessor p;
-    private  void onRecord(){
-        if (isRecording) {
-            recordButton.setText("Start Recording");
-            stopRecording();
-        }else {
-            recordButton.setText("Stop Recording");
-            startRecording();
-        }
-        isRecording = !isRecording;
-    }
 
-    private void onPlaying(){
-        if (isPlaying) {
-            playButton.setText("Start Playing");
-            stopPlaying();
-        }else {
-            playButton.setText("Stop Playing");
-            startPlaying();
-        }
-        isPlaying = !isPlaying;
-    }
-    private void startRecording(){
-        // create MediaRecorder to get the audio
-        recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setOutputFile(fileName);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        try {
-            recorder.prepare();
-        }catch (IOException e){
-            Log.e("", "recorder prepare failed");
-        }
-        recorder.start();
-    }
-
-    private void stopRecording(){
-        if (!isRecording)
-            return;
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-    }
-
-
-    private void startPlaying(){
-        player = new MediaPlayer();
-        try{
-            player.setDataSource(fileName);
-            player.prepare();
-            player.start();
-        }catch (IOException e){
-            Log.e("", "startPlaying error at setDataSource()");
-        }
-    }
-
-    private void stopPlaying(){
-        if (!isPlaying)
-            return;
-        player.release();
-        player = null;
-    }
 
     private void onDetecting(){
         if (!isDetecting) {
             detectButton.setText("STOP DETECTING");
+
+            decodedMessage = (TextView) findViewById(R.id.decodeSoundMessage);
+            decodedMessage.setText("");
+
             isDetecting = true;
             dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
             pitch = -1;
@@ -150,13 +90,17 @@ public class AudioActivity extends ActionBarActivity {
                                         tv.setText("Sound duration: " + duration);
                                         EditText morseEt = (EditText) findViewById(R.id.morseEt);
                                         morseEt.append(beepToMorse(duration));
+                                        // This is where it starts to decode the message and show it.
+                                        decodedMessage.setText(MorseCode.decode(morseEt.getText().toString()));
                                     } else {
                                         TextView tv = (TextView) findViewById(R.id.silenceTv);
                                         tv.setText("Silence duration" + silenceDuration);
-                                        if (isNewChar(silenceDuration))
-                                            tv.append(" ");
-                                        else if (isNewWord(silenceDuration))
-                                            tv.append(" / ");
+                                        EditText morseEt = (EditText) findViewById(R.id.morseEt);
+                                        if (isNewChar(silenceDuration)){
+                                            morseEt.append(" ");
+                                        }
+                                        if (isNewWord(silenceDuration))
+                                            morseEt.append(" / ");
                                     }
                                     needUIUpdate = false;
                                 }
@@ -180,13 +124,13 @@ public class AudioActivity extends ActionBarActivity {
     }
 
     private boolean isNewWord(long ms){
-        if (ms > 430l && ms < 600l)
+        if (ms > 1900l && ms < 2800l)
             return true;
         return false;
     }
 
     private boolean isNewChar(long ms){
-        if (ms > 930l && ms < 1200l)
+        if (ms > 600l && ms < 1400l)
             return true;
         return false;
     }
@@ -196,28 +140,10 @@ public class AudioActivity extends ActionBarActivity {
         setContentView(R.layout.activity_audio);
 
         fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio.3gp";
-        isPlaying = false;
-        isRecording = false;
         isDetecting = false;
         needUIUpdate = false;
         // get buttons
-        recordButton = (Button)findViewById(R.id.recordB);
-        playButton = (Button)findViewById(R.id.playB);
         detectButton = (Button)findViewById(R.id.detectB);
-
-        recordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRecord();
-            }
-        });
-
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPlaying();
-            }
-        });
 
         detectButton.setOnClickListener(new View.OnClickListener() {
             @Override

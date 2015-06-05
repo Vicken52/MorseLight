@@ -9,25 +9,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Recording"
-        android:id="@+id/recordB"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Playing"
-        android:id="@+id/playB"
-        android:layout_alignTop="@+id/recordB"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="start detecting"
         android:id="@+id/detectB"
-        android:layout_below="@+id/recordB"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp" />
 
@@ -61,5 +44,14 @@
         android:id="@+id/morseEt"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/playB" />
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decoded message will go here"
+        android:id="@+id/decodeSoundMessage"
+        android:layout_below="@+id/morseEt"
+        android:layout_alignEnd="@+id/morseEt"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
