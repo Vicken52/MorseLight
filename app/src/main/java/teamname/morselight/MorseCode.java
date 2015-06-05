@@ -65,4 +65,21 @@ public class MorseCode {
         return result;
     }
 
+    public static String decodeAll(String str){
+        String result = "";
+        String[] splitString = str.split(" ");
+        for(String s : splitString){
+            String temp = s.trim();
+            for(String morseCode : morses){
+                if(temp.equals(morseCode)){
+                    if (morseCode == "/")
+                        result += " ";
+                    else
+                        result += MORSE_MAP.get(morseCode);
+                }
+            }
+        }
+        return result;
+    }
+
 }

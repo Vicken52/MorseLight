@@ -91,7 +91,7 @@ public class AudioActivity extends ActionBarActivity {
                                         EditText morseEt = (EditText) findViewById(R.id.morseEt);
                                         morseEt.append(beepToMorse(duration));
                                         // This is where it starts to decode the message and show it.
-                                        decodedMessage.setText(MorseCode.decode(morseEt.getText().toString()));
+                                        decodedMessage.setText(MorseCode.decodeAll(morseEt.getText().toString()));
                                     } else {
                                         TextView tv = (TextView) findViewById(R.id.silenceTv);
                                         tv.setText("Silence duration" + silenceDuration);
