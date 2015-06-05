@@ -1,10 +1,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MorseLight">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/sound_setting" android:title="Sound"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MorseLight">
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="100"
+        android:title="@string/action_help"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:title="@string/action_about"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sound_setting"
         android:icon="@drawable/abc_btn_radio_material"
-        app:showAsAction="always"
-        />
+        android:title="Sound"
+        app:showAsAction="always" />
 </menu>

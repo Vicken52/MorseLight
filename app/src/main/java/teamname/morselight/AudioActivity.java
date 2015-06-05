@@ -5,9 +5,9 @@ package teamname.morselight;
 
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,28 +27,29 @@ public class AudioActivity extends ActionBarActivity {
     private boolean isRecording, isPlaying;
 
 
-    private  void onRecord(){
+    private void onRecord() {
         if (isRecording) {
             recordButton.setText("Start Recording");
             stopRecording();
-        }else {
+        } else {
             recordButton.setText("Stop Recording");
             startRecording();
         }
         isRecording = !isRecording;
     }
 
-    private void onPlaying(){
+    private void onPlaying() {
         if (isPlaying) {
             playButton.setText("Start Playing");
             stopPlaying();
-        }else {
+        } else {
             playButton.setText("Stop Playing");
             startPlaying();
         }
         isPlaying = !isPlaying;
     }
-    private void startRecording(){
+
+    private void startRecording() {
         // create MediaRecorder to get the audio
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -58,13 +59,13 @@ public class AudioActivity extends ActionBarActivity {
 
         try {
             recorder.prepare();
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.e("", "recorder prepare failed");
         }
         recorder.start();
     }
 
-    private void stopRecording(){
+    private void stopRecording() {
         if (!isRecording)
             return;
         recorder.stop();
@@ -73,18 +74,18 @@ public class AudioActivity extends ActionBarActivity {
     }
 
 
-    private void startPlaying(){
+    private void startPlaying() {
         player = new MediaPlayer();
-        try{
+        try {
             player.setDataSource(fileName);
             player.prepare();
             player.start();
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.e("", "startPlaying error at setDataSource()");
         }
     }
 
-    private void stopPlaying(){
+    private void stopPlaying() {
         if (!isPlaying)
             return;
         player.release();
@@ -100,8 +101,8 @@ public class AudioActivity extends ActionBarActivity {
         isPlaying = false;
         isRecording = false;
         // get buttons
-        recordButton = (Button)findViewById(R.id.recordB);
-        playButton = (Button)findViewById(R.id.playB);
+        recordButton = (Button) findViewById(R.id.recordB);
+        playButton = (Button) findViewById(R.id.playB);
 
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override

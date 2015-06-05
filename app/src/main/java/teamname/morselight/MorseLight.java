@@ -9,8 +9,8 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -26,7 +26,7 @@ public class MorseLight extends ActionBarActivity {
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
     // Detect low battery level and create a DialogInterface warning
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -49,13 +49,12 @@ public class MorseLight extends ActionBarActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_morse_light);
 
-        plain = (EditText)findViewById(R.id.PlainText);
+        plain = (EditText) findViewById(R.id.PlainText);
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
 
@@ -70,7 +69,8 @@ public class MorseLight extends ActionBarActivity {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -99,9 +99,13 @@ public class MorseLight extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }else if (id == R.id.sound_setting){
+        if (id == R.id.action_help) {
+            Intent intent = new Intent(MorseLight.this, Help.class);
+            startActivity(intent);
+        } else if (id == R.id.action_about) {
+            Intent intent = new Intent(MorseLight.this, About.class);
+            startActivity(intent);
+        } else if (id == R.id.sound_setting) {
             Intent intent = new Intent(MorseLight.this, AudioActivity.class);
             startActivity(intent);
         }
