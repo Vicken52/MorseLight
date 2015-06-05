@@ -25,6 +25,12 @@
             android:name="com.google.android.gms.version"
             android:value=""
             />
-    </application>
+        <activity
+            android:name=".AudioActivity"
+            android:label="@string/title_activity_audio" >
+        </activity>
 
+    </application>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 </manifest>
