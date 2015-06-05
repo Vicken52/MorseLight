@@ -121,52 +121,57 @@ public class AudioActivity extends ActionBarActivity {
             duration = 0;
             gotSound = false;
             silenceStart = Calendar.getInstance().getTimeInMillis();
-            pdh = new PitchDetectionHandler() {
-                @Override
-                public void handlePitch(PitchDetectionResult result, AudioEvent e) {
-                    final float pitchInHz = result.getPitch();
-                    if ((pitchInHz > threshold) && !gotSound) {
-                        startTime = Calendar.getInstance().getTimeInMillis();
-                        silenceDuration = startTime - silenceStart;
-                        gotSound = true;
-                        needUIUpdate = true;
-                    } else if ((pitchInHz < threshold) && gotSound) {
-                        currentTime = Calendar.getInstance().getTimeInMillis();
-                        duration = currentTime - startTime;
-                        startTime = currentTime;
-                        gotSound = false;
-                        silenceStart = currentTime;
-                        needUIUpdate = true;
-                    }
-                    if (needUIUpdate) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                TextView text = (TextView) findViewById(R.id.pitchTv);
-                                text.setText("Pitch (Hz): " + pitchInHz);
-                                if (!gotSound) {
-                                    TextView tv = (TextView) findViewById(R.id.soundTv);
-                                    tv.setText("Sound duration: " + duration);
-                                    EditText morseEt = (EditText) findViewById(R.id.morseEt);
-                                    morseEt.append(beepToMorse(duration));
-                                } else {
-                                    TextView tv = (TextView) findViewById(R.id.silenceTv);
-                                    tv.setText("Silence duration" + silenceDuration);
+            if (pdh == null) {
+                pdh = new PitchDetectionHandler() {
+                    @Override
+                    public void handlePitch(PitchDetectionResult result, AudioEvent e) {
+                        final float pitchInHz = result.getPitch();
+                        if ((pitchInHz > threshold) && !gotSound) {
+                            startTime = Calendar.getInstance().getTimeInMillis();
+                            silenceDuration = startTime - silenceStart;
+                            gotSound = true;
+                            needUIUpdate = true;
+                        } else if ((pitchInHz < threshold) && gotSound) {
+                            currentTime = Calendar.getInstance().getTimeInMillis();
+                            duration = currentTime - startTime;
+                            startTime = currentTime;
+                            gotSound = false;
+                            silenceStart = currentTime;
+                            needUIUpdate = true;
+                        }
+                        if (needUIUpdate) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TextView text = (TextView) findViewById(R.id.pitchTv);
+                                    text.setText("Pitch (Hz): " + pitchInHz);
+                                    if (!gotSound) {
+                                        TextView tv = (TextView) findViewById(R.id.soundTv);
+                                        tv.setText("Sound duration: " + duration);
+                                        EditText morseEt = (EditText) findViewById(R.id.morseEt);
+                                        morseEt.append(beepToMorse(duration));
+                                    } else {
+                                        TextView tv = (TextView) findViewById(R.id.silenceTv);
+                                        tv.setText("Silence duration" + silenceDuration);
+                                    }
+                                    needUIUpdate = false;
                                 }
-                                needUIUpdate = false;
-                            }
-                        });
+                            });
+                        }
                     }
-                }
-            };
-            p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+                };
+            }
+            if (p == null)
+                p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
             dispatcher.addAudioProcessor(p);
             new Thread(dispatcher, "Audio Dispatcher").start();
         }else{
             isDetecting = false;
             detectButton.setText("START DETECTING");
-            if (dispatcher != null)
+            if (dispatcher != null) {
                 dispatcher.removeAudioProcessor(p);
+                dispatcher.stop();  // this will stop audio processing
+            }
         }
     }
 
