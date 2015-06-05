@@ -153,6 +153,10 @@ public class AudioActivity extends ActionBarActivity {
                                     } else {
                                         TextView tv = (TextView) findViewById(R.id.silenceTv);
                                         tv.setText("Silence duration" + silenceDuration);
+                                        if (isNewChar(silenceDuration))
+                                            tv.append(" ");
+                                        else if (isNewWord(silenceDuration))
+                                            tv.append(" / ");
                                     }
                                     needUIUpdate = false;
                                 }
@@ -175,6 +179,17 @@ public class AudioActivity extends ActionBarActivity {
         }
     }
 
+    private boolean isNewWord(long ms){
+        if (ms > 430l && ms < 600l)
+            return true;
+        return false;
+    }
+
+    private boolean isNewChar(long ms){
+        if (ms > 930l && ms < 1200l)
+            return true;
+        return false;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,7 +230,7 @@ public class AudioActivity extends ActionBarActivity {
     private String beepToMorse(long ms){
         if (ms > 180l && ms < 300l)
             return ".";
-        else if (ms > 900l && ms < 1150l)
+        if (ms > 600l && ms < 850l)
             return "-";
         return "";
     }
