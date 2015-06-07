@@ -29,7 +29,26 @@
             android:name=".AudioActivity"
             android:label="@string/title_activity_audio" >
         </activity>
-
+        <activity
+            android:name=".Help"
+            android:label="@string/action_help" >
+        </activity>
+        <activity
+            android:name=".About"
+            android:label="@string/action_about" >
+        </activity>
+        <activity
+            android:name=".Help1"
+            android:label="@string/title_activity_help1" >
+            </activity>
+        <activity
+            android:name=".Help2"
+            android:label="@string/title_activity_help2" >
+        </activity>
+        <activity
+            android:name=".Help3"
+            android:label="@string/title_activity_help3" >
+        </activity>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

@@ -11,13 +11,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
-import android.os.Handler;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +34,7 @@ public class MorseLight extends ActionBarActivity {
     private MediaPlayer b = null, l = null, p = null;
 
     // Detect low battery level and create a DialogInterface warning
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -65,7 +63,7 @@ public class MorseLight extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_morse_light);
 
-        plain = (EditText)findViewById(R.id.PlainText);
+        plain = (EditText) findViewById(R.id.PlainText);
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
         button = (Button) findViewById(R.id.button);
@@ -85,7 +83,8 @@ public class MorseLight extends ActionBarActivity {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -100,11 +99,11 @@ public class MorseLight extends ActionBarActivity {
             public void onClick(View v) {
                 String text = plain.getText().toString().trim();
                 encode = "";
-                if (!text.isEmpty()){
+                if (!text.isEmpty()) {
                     MorseCode code = new MorseCode();
                     encode = code.encode(text);
                     long duration = 0;
-                    new Thread(new Runnable(){
+                    new Thread(new Runnable() {
                         public void run() {
                             playSounds(encode);
                         }
@@ -117,38 +116,40 @@ public class MorseLight extends ActionBarActivity {
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-    public void playSounds(String text){
+    public void playSounds(String text) {
         int delay = 0;
-        float maxVol = 10*.01f;
-        for(int i = 0; i < text.length(); i++){
-            if(b.isPlaying() || l.isPlaying()){
+        float maxVol = 10 * .01f;
+        for (int i = 0; i < text.length(); i++) {
+            if (b.isPlaying() || l.isPlaying()) {
                 i--;
-            }else{
-                if(text.charAt(i) == '.'){
+            } else {
+                if (text.charAt(i) == '.') {
                     b.setVolume(maxVol, maxVol);
                     b.start();
-                }else if (text.charAt(i) == '-'){
+                } else if (text.charAt(i) == '-') {
                     l.setVolume(maxVol, maxVol);
                     l.start();
-                }else if (text.charAt(i) == '/'){
+                } else if (text.charAt(i) == '/') {
                     //p.seekTo(0);
                     //p.start();
                     //delay = 2000;
                     SystemClock.sleep(500);
-                }else if (text.charAt(i) == ' '){
+                } else if (text.charAt(i) == ' ') {
                     SystemClock.sleep(300);
                 }
             }
         }
     }
 
-    Runnable stopPlayerTask = new Runnable(){
+    Runnable stopPlayerTask = new Runnable() {
         @Override
         public void run() {
             p.stop();
-        }};
+        }
+    };
+
     public void createBeep() {
-        float maxVol = 75*.01f;
+        float maxVol = 75 * .01f;
         try {
             b = new MediaPlayer();
 
@@ -165,8 +166,8 @@ public class MorseLight extends ActionBarActivity {
         }
     }
 
-    public void createPause(){
-        float maxVol = 75*.01f;
+    public void createPause() {
+        float maxVol = 75 * .01f;
         try {
             p = new MediaPlayer();
 
@@ -184,7 +185,7 @@ public class MorseLight extends ActionBarActivity {
     }
 
     public void createLongBeep() {
-        float maxVol = 75*.01f;
+        float maxVol = 75 * .01f;
         try {
             l = new MediaPlayer();
 
@@ -217,9 +218,13 @@ public class MorseLight extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }else if (id == R.id.sound_setting){
+        if (id == R.id.action_help) {
+            Intent intent = new Intent(MorseLight.this, Help.class);
+            startActivity(intent);
+        } else if (id == R.id.action_about) {
+            Intent intent = new Intent(MorseLight.this, About.class);
+            startActivity(intent);
+        } else if (id == R.id.sound_setting) {
             Intent intent = new Intent(MorseLight.this, AudioActivity.class);
             startActivity(intent);
         }
