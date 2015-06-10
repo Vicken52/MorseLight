@@ -5,10 +5,7 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_about" android:title="@string/action_about"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/sound_setting" android:title="Sound"
-        android:icon="@drawable/abc_btn_radio_material"
-        app:showAsAction="always" />
-    <item android:id="@+id/light_setting" android:title="Light"
+    <item android:id="@+id/decode_setting" android:title="@string/decode"
         android:icon="@drawable/abc_btn_radio_material"
         app:showAsAction="always" />
 </menu>

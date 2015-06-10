@@ -290,12 +290,15 @@ public class MorseLight extends ActionBarActivity {
         } else if (id == R.id.action_about) {
             Intent intent = new Intent(MorseLight.this, About.class);
             startActivity(intent);
-        } else if (id == R.id.sound_setting) {
-            Intent intent = new Intent(MorseLight.this, AudioActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.light_setting) {
-            Intent intent = new Intent(MorseLight.this, LightActivity.class);
-            startActivity(intent);
+        } else if (id == R.id.decode_setting) {
+            if (light) {
+                camera.release();
+                Intent intent = new Intent(MorseLight.this, LightActivity.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(MorseLight.this, AudioActivity.class);
+                startActivity(intent);
+            }
         }
 
         return super.onOptionsItemSelected(item);
