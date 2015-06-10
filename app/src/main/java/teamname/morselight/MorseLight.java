@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetFileDescriptor;
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
@@ -22,7 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
@@ -32,10 +34,12 @@ public class MorseLight extends ActionBarActivity {
     private EditText plain;
     private TextView morse, decode;
     private Button button;
-    private RadioButton radioButton;
+    private Switch switch1;
     private String encode = "";
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null, p = null;
+    Camera camera = Camera.open();
+    Parameters parameters = camera.getParameters();
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
@@ -66,12 +70,12 @@ public class MorseLight extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_morse_light);
-
+        light = false;
         plain = (EditText) findViewById(R.id.PlainText);
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
         button = (Button) findViewById(R.id.button);
-        radioButton = (RadioButton) findViewById(R.id.radioButton);
+        switch1 = (Switch) findViewById(R.id.switch1);
 
         createBeep();
         createLongBeep();
@@ -109,16 +113,13 @@ public class MorseLight extends ActionBarActivity {
                     encode = code.encode(text);
                     long duration = 0;
 
-                    if(light)
-                    {
+                    if (light) {
                         new Thread(new Runnable() {
                             public void run() {
                                 playLights(encode);
                             }
                         }).start();
-                    }
-                    else
-                    {
+                    } else {
                         new Thread(new Runnable() {
                             public void run() {
                                 playSounds(encode);
@@ -129,29 +130,24 @@ public class MorseLight extends ActionBarActivity {
             }
         });
 
-        // Display the low battery warning DialogInterface
-        this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-    }
-
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch(view.getId())
-        {
-            case R.id.radioButton:
-                if (checked)
+        switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
                 {
-                    radioButton.setText("Light");
+                    switch1.setText("Light");
                     light = true;
                 }
                 else
                 {
-                    radioButton.setText("Sound");
-                    light = false;
+                    switch1.setText("Sound");
+                    light = true;
                 }
-        }
+            }
+        });
+
+        // Display the low battery warning DialogInterface
+        this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     public void playSounds(String text) {
@@ -180,7 +176,35 @@ public class MorseLight extends ActionBarActivity {
     }
 
     public void playLights(String text) {
+        parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(parameters);
 
+        for (int i = 0; i < text.length(); i++)
+        {
+            if (text.charAt(i) == '.')
+            {
+                camera.startPreview();
+                SystemClock.sleep(200);
+                camera.stopPreview();
+            }
+            else if (text.charAt(i) == '-')
+            {
+                camera.startPreview();
+                SystemClock.sleep(500);
+                camera.stopPreview();
+            }
+            else if (text.charAt(i) == '/')
+            {
+                //p.seekTo(0);
+                //p.start();
+                //delay = 2000;
+                SystemClock.sleep(500);
+            }
+            else if (text.charAt(i) == ' ')
+            {
+                SystemClock.sleep(300);
+            }
+        }
     }
 
     Runnable stopPlayerTask = new Runnable() {

@@ -23,21 +23,16 @@
         android:id="@+id/button"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/radioGroup" />
+        android:layout_toStartOf="@+id/switch1" />
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:text="@string/Sound"
+        android:id="@+id/switch1"
         android:layout_alignBottom="@+id/button"
-        android:id="@+id/radioGroup"
-        android:layout_below="@+id/PlainText">
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Sound"
-            android:id="@+id/radioButton"/>
-    </RadioGroup>
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/PlainText" />
 
     <TextView
         android:layout_width="wrap_content"
