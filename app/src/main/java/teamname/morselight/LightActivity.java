@@ -6,39 +6,48 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.PictureCallback;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
-import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class MorseLight extends ActionBarActivity {
+public class LightActivity extends ActionBarActivity {
     TextWatcher input = null;
-    private boolean light;
     private EditText plain;
     private TextView morse, decode;
     private Button button;
-    private RadioButton radioButton;
     private String encode = "";
+    private AudioManager aManager = null;
+    private Camera mCamera;
+    private CameraPreview mPreview;
+    private boolean cameraFront = false;
+    private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-    private MediaPlayer b = null, l = null, p = null;
+    private MediaPlayer b = null, l = null;
 
     // Detect low battery level and create a DialogInterface warning
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -60,22 +69,81 @@ public class MorseLight extends ActionBarActivity {
             }
         }
     };
+    private int findFrontFacingCamera(){
+        int cameraId = -1;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for(int i = 0; i < numberOfCameras; i++){
+            CameraInfo info = new CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if(info.facing == CameraInfo.CAMERA_FACING_FRONT){
+                cameraId = i;
+                cameraFront = true;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
+    private int findBackFacingCamear(){
+        int cameraId = -1;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for(int i = 0; i < numberOfCameras; i++){
+            CameraInfo info = new CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if(info.facing == CameraInfo.CAMERA_FACING_BACK){
+                cameraId = i;
+                cameraFront = false;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
+    private boolean checkCameraHardware(Context context){
+        if(context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try{
+            c = Camera.open();
+            Camera.Parameters param = c.getParameters();
+            Log.v("param", param.toString());
+        } catch(Exception e){
+
+        }
+        return c;
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_morse_light);
+        setContentView(R.layout.activity_light);
 
-        plain = (EditText) findViewById(R.id.PlainText);
+        plain = (EditText)findViewById(R.id.PlainText);
         morse = (TextView) findViewById(R.id.MorseCode);
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
         button = (Button) findViewById(R.id.button);
-        radioButton = (RadioButton) findViewById(R.id.radioButton);
+        button.requestFocus();
+        aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        volume = (float) aManager.getStreamVolume(AudioManager.STREAM_RING);
 
         createBeep();
         createLongBeep();
-        createPause();
+
+        if (checkCameraHardware(this.getApplicationContext())){
+            mCamera = getCameraInstance();
+            mPreview = new CameraPreview(this, mCamera);
+            FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
+            preview.addView(mPreview);
+        }else{
+            Log.v("CAMERA", "did not load the camera");
+        }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
@@ -88,8 +156,7 @@ public class MorseLight extends ActionBarActivity {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -107,23 +174,15 @@ public class MorseLight extends ActionBarActivity {
                 if (!text.isEmpty()) {
                     MorseCode code = new MorseCode();
                     encode = code.encode(text);
-                    long duration = 0;
-
-                    if(light)
-                    {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playLights(encode);
-                            }
-                        }).start();
-                    }
-                    else
-                    {
+                    if (aManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                        long duration = 0;
                         new Thread(new Runnable() {
                             public void run() {
                                 playSounds(encode);
                             }
                         }).start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -133,65 +192,29 @@ public class MorseLight extends ActionBarActivity {
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch(view.getId())
-        {
-            case R.id.radioButton:
-                if (checked)
-                {
-                    radioButton.setText("Light");
-                    light = true;
-                }
-                else
-                {
-                    radioButton.setText("Sound");
-                    light = false;
-                }
-        }
-    }
-
-    public void playSounds(String text) {
+    public void playSounds(String text){
         int delay = 0;
-        float maxVol = 10 * .01f;
-        for (int i = 0; i < text.length(); i++) {
-            if (b.isPlaying() || l.isPlaying()) {
+        float maxVol = 10*.01f;
+        maxVol = (float) aManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
+        for(int i = 0; i < text.length(); i++){
+            if(b.isPlaying() || l.isPlaying()){
                 i--;
-            } else {
-                if (text.charAt(i) == '.') {
+            }else{
+                if(text.charAt(i) == '.'){
                     b.setVolume(maxVol, maxVol);
                     b.start();
-                } else if (text.charAt(i) == '-') {
+                }else if (text.charAt(i) == '-'){
                     l.setVolume(maxVol, maxVol);
                     l.start();
-                } else if (text.charAt(i) == '/') {
-                    //p.seekTo(0);
-                    //p.start();
-                    //delay = 2000;
-                    SystemClock.sleep(500);
-                } else if (text.charAt(i) == ' ') {
-                    SystemClock.sleep(300);
+                }else if (text.charAt(i) == '/'){
+                    SystemClock.sleep(750);
                 }
             }
         }
     }
 
-    public void playLights(String text) {
-
-    }
-
-    Runnable stopPlayerTask = new Runnable() {
-        @Override
-        public void run() {
-            p.stop();
-        }
-    };
-
     public void createBeep() {
-        float maxVol = 75 * .01f;
+        float maxVol = 75*.01f;
         try {
             b = new MediaPlayer();
 
@@ -208,26 +231,8 @@ public class MorseLight extends ActionBarActivity {
         }
     }
 
-    public void createPause() {
-        float maxVol = 75 * .01f;
-        try {
-            p = new MediaPlayer();
-
-            AssetFileDescriptor descriptor = getAssets().openFd("pause.wav");
-            p.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
-            descriptor.close();
-
-            p.prepare();
-            p.setVolume(maxVol, maxVol);
-            p.setLooping(false);
-            //b.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void createLongBeep() {
-        float maxVol = 75 * .01f;
+        float maxVol = 75*.01f;
         try {
             l = new MediaPlayer();
 
@@ -260,18 +265,8 @@ public class MorseLight extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_help) {
-            Intent intent = new Intent(MorseLight.this, Help.class);
-            startActivity(intent);
-        } else if (id == R.id.action_about) {
-            Intent intent = new Intent(MorseLight.this, About.class);
-            startActivity(intent);
-        } else if (id == R.id.sound_setting) {
-            Intent intent = new Intent(MorseLight.this, AudioActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.light_setting) {
-            Intent intent = new Intent(MorseLight.this, LightActivity.class);
-            startActivity(intent);
+        if (id == R.id.action_settings) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

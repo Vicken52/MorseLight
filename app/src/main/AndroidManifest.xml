@@ -30,6 +30,10 @@
             android:label="@string/title_activity_audio" >
         </activity>
         <activity
+            android:name=".LightActivity"
+            android:label="@string/title_activity_light" >
+        </activity>
+        <activity
             android:name=".Help"
             android:label="@string/action_help" >
         </activity>
@@ -52,4 +56,6 @@
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>
