@@ -294,11 +294,9 @@ public class MorseLight extends ActionBarActivity {
             if (light) {
                 camera.release();
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(MorseLight.this, AudioActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             }
         }

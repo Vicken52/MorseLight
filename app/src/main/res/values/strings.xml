@@ -5,9 +5,9 @@
     <string name="Sound">Sound</string>
     <string name="Flash">Flash</string>
     <string name="Default">Please enter a phrase above to be converted to Morse Code.</string>
-    <string name="action_settings">Flash/Sound</string>
-    <string name="title_activity_audio">Audio Decode</string>
-    <string name="title_activity_light">Light Decode</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_audio">AudioActivity</string>
+    <string name="title_activity_light">LightActivity</string>
     <string name="action_help">Help</string>
     <string name="action_about">About</string>
 

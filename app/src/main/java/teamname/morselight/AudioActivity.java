@@ -3,7 +3,6 @@ http://developer.android.com/guide/topics/media/audio-capture.html
  */
 package teamname.morselight;
 
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -176,12 +175,8 @@ public class AudioActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_help) {
-            Intent intent = new Intent(AudioActivity.this, Help.class);
-            startActivity(intent);
-        } else if (id == R.id.action_about) {
-            Intent intent = new Intent(AudioActivity.this, About.class);
-            startActivity(intent);
+        if (id == R.id.action_settings) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
