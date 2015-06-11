@@ -31,6 +31,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 
 public class LightActivity extends ActionBarActivity {
     TextWatcher input = null;
@@ -69,6 +71,17 @@ public class LightActivity extends ActionBarActivity {
             }
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            mPreview.resume();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private int findFrontFacingCamera(){
         int cameraId = -1;
         int numberOfCameras = Camera.getNumberOfCameras();
@@ -190,6 +203,13 @@ public class LightActivity extends ActionBarActivity {
 
         // Display the low battery warning DialogInterface
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(this.mBatInfoReceiver);
+        mPreview.pause();
     }
 
     public void playSounds(String text){
