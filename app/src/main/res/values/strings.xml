@@ -91,6 +91,6 @@
         \n2. Press the signal button to start the translation.
         \n3. The LED flash on the device flashes based on the morse code.
         \m4. If you want to decode the flash light from another device, press the circle button on the top.
-        \nWarning: The sound-light switch will be grayed out if the battery level is low..
+        \nWarning: The sound-light switch will be grayed out if the battery level is low.
     </string>
 </resources>
