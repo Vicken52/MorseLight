@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
-    private boolean light;
+    private boolean light, isDialogShowed;
     private EditText plain;
     private TextView morse, decode;
     private Button button;
@@ -51,7 +51,7 @@ public class MorseLight extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            if (batteryLevel <= 10) {
+            if (batteryLevel <= 10 && !isDialogShowed) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
@@ -64,14 +64,17 @@ public class MorseLight extends ActionBarActivity {
                                 dialog.dismiss();
                                 switch1 = (Switch) findViewById(R.id.switch1);
                                 switch1.setEnabled(false);
+                                switch1.setChecked(false);  // force it to sound
                             }
                         });
                 AlertDialog alert = builder.create();
+                isDialogShowed = true;
                 alert.show();
             }
-            if (batteryLevel > 10) {
+            else if (batteryLevel > 10) {
                 switch1 = (Switch)findViewById(R.id.switch1);
                 switch1.setEnabled(true);
+                isDialogShowed = false;
             }
         }
     };
@@ -90,7 +93,7 @@ public class MorseLight extends ActionBarActivity {
         createBeep();
         createLongBeep();
         createPause();
-
+        isDialogShowed = false;
         if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
         {
             Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();

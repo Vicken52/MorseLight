@@ -44,7 +44,7 @@ public class LightActivity extends ActionBarActivity {
     private AudioManager aManager = null;
     private Camera mCamera;
     private CameraPreview mPreview;
-    private boolean cameraFront = false;
+    private boolean cameraFront = false, isDialogShowed;
     private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null;
@@ -54,7 +54,7 @@ public class LightActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            if (batteryLevel <= 10) {
+            if (batteryLevel <= 10 && !isDialogShowed) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
@@ -67,7 +67,9 @@ public class LightActivity extends ActionBarActivity {
                                 dialog.dismiss();
                                 MorseLight.switch1 = (Switch) findViewById(R.id.switch1);
                                 MorseLight.switch1.setEnabled(false);
+                                MorseLight.switch1.setChecked(false);
                                 Intent intent = new Intent(LightActivity.this, MorseLight.class);
+                                isDialogShowed = true;
                                 startActivity(intent);
                             }
                         });
@@ -80,6 +82,7 @@ public class LightActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        isDialogShowed = false;
         //setContentView(R.layout.activity_light);
         try {
             if (mCamera == null){
