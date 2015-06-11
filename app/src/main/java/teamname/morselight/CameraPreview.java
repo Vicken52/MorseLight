@@ -15,7 +15,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public CameraPreview(Context context, Camera camera){
+    public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
 
@@ -25,35 +25,51 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-    public void surfaceCreated(SurfaceHolder holder){
-        try{
+    public void surfaceCreated(SurfaceHolder holder) {
+        try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
-        } catch (IOException e){
+        } catch (IOException e) {
             Log.d("IOERROR", "error");
         }
     }
 
-    public void surfaceDestroyed(SurfaceHolder holder){
+    public void surfaceDestroyed(SurfaceHolder holder) {
 
     }
 
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h){
-        if(mHolder.getSurface() == null){
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        if (mHolder.getSurface() == null) {
             return;
         }
 
-        try{
+        try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
 
         }
 
-        try{
+        try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
-        } catch(Exception e){
+        } catch (Exception e) {
             Log.d("Preview", "preview mCamera error");
+        }
+    }
+
+    public void pause() {
+        mCamera.release();
+    }
+
+    public void resume() throws IOException {
+        if (mCamera != null) {
+            mCamera.reconnect();
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+            } catch (Exception e) {
+                Log.d("Preview", "preview mCamera error");
+            }
         }
     }
 }
