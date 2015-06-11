@@ -19,6 +19,7 @@ import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,12 +143,12 @@ public class MorseLight extends ActionBarActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked)
                 {
-                    switch1.setText("Light");
+                    switch1.setText("");
                     light = true;
                 }
                 else
                 {
-                    switch1.setText("Sound");
+                    switch1.setText("");
                     light = false;
                 }
             }
@@ -301,13 +302,28 @@ public class MorseLight extends ActionBarActivity {
             if (light) {
                 camera.release();
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(MorseLight.this, AudioActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("HELP", "this is where the onStop is played");
+        camera.release();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("HELP", "this is where the onRestart is played");
     }
 }

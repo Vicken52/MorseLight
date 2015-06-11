@@ -274,7 +274,7 @@ public class LightActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_morse_light, menu);
+        getMenuInflater().inflate(R.menu.menu_light, menu);
         return true;
     }
 
@@ -286,11 +286,17 @@ public class LightActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_help) {
+        if (id == R.id.action_help_light) {
             Intent intent = new Intent(LightActivity.this, Help.class);
+            mCamera.release();
             startActivity(intent);
-        } else if (id == R.id.action_about) {
+        } else if (id == R.id.action_about_light) {
             Intent intent = new Intent(LightActivity.this, About.class);
+            mCamera.release();
+            startActivity(intent);
+        } else if (id == R.id.encode_setting_light){
+            Intent intent = new Intent(LightActivity.this, MorseLight.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             startActivity(intent);
         }
 

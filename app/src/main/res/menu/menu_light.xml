@@ -4,11 +4,11 @@
     tools:context="teamname.morselight.LightActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_help" android:title="@string/action_help"
+    <item android:id="@+id/action_help_light" android:title="@string/action_help"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_about" android:title="@string/action_about"
+    <item android:id="@+id/action_about_light" android:title="@string/action_about"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/decode_setting" android:title="@string/decode"
+    <item android:id="@+id/encode_setting_light" android:title="@string/decode"
         android:icon="@drawable/action_bar_encode"
         app:showAsAction="always" />
 </menu>

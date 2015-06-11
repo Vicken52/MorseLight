@@ -188,11 +188,15 @@ public class AudioActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_help) {
+        if (id == R.id.action_help_audio) {
             Intent intent = new Intent(AudioActivity.this, Help.class);
             startActivity(intent);
-        } else if (id == R.id.action_about) {
+        } else if (id == R.id.action_about_audio) {
             Intent intent = new Intent(AudioActivity.this, About.class);
+            startActivity(intent);
+        } else if (id == R.id.encode_setting_audio){
+            Intent intent = new Intent(AudioActivity.this, MorseLight.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             startActivity(intent);
         }
 
