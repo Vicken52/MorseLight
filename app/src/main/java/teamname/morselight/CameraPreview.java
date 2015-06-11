@@ -39,7 +39,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void pause() {
-        mCamera.stopPreview();
+        //mCamera.stopPreview();
         mCamera = null;
     }
 

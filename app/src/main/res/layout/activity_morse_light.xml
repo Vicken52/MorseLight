@@ -47,7 +47,6 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/PlainText"
             android:textSize="18dp"
-            android:layout_weight=".25"
             android:showText="true" />
     </LinearLayout>
 
