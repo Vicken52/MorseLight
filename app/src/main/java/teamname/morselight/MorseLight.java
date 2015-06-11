@@ -141,7 +141,7 @@ public class MorseLight extends ActionBarActivity {
                 else
                 {
                     switch1.setText("Sound");
-                    light = true;
+                    light = false;
                 }
             }
         });
