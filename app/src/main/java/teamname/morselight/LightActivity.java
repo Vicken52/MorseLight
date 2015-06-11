@@ -77,7 +77,10 @@ public class LightActivity extends ActionBarActivity {
         super.onResume();
         //setContentView(R.layout.activity_light);
         try {
-            mPreview.resume();
+            if (mCamera == null){
+                mCamera = getCameraInstance();
+            }
+            mPreview.resume(mCamera);
             this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         } catch (IOException e) {
             e.printStackTrace();
@@ -211,6 +214,9 @@ public class LightActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         this.unregisterReceiver(this.mBatInfoReceiver);
+        mPreview.pause();
+        mCamera.release();
+        mCamera = null;
     }
 
     public void playSounds(String text){
