@@ -77,6 +77,7 @@ public class LightActivity extends ActionBarActivity {
         super.onResume();
         try {
             mPreview.resume();
+            this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         } catch (IOException e) {
             e.printStackTrace();
         }
