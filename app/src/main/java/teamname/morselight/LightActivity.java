@@ -75,6 +75,7 @@ public class LightActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //setContentView(R.layout.activity_light);
         try {
             mPreview.resume();
             this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -210,7 +211,6 @@ public class LightActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         this.unregisterReceiver(this.mBatInfoReceiver);
-        mPreview.pause();
     }
 
     public void playSounds(String text){

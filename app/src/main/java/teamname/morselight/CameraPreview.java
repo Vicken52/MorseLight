@@ -57,10 +57,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    public void pause() {
-        mCamera.release();
-    }
-
     public void resume() throws IOException {
         if (mCamera != null) {
             mCamera.reconnect();

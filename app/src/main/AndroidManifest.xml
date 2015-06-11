@@ -40,13 +40,13 @@
         <activity
             android:name=".AudioActivity"
             android:label="@string/title_activity_audio"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".LightActivity"
             android:label="@string/title_activity_light"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait">
         </activity>
         <activity
@@ -75,12 +75,4 @@
             android:screenOrientation="portrait">
         </activity>
     </application>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-permission android:name="android.permission.FLASHLIGHT"/>
-    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
-
 </manifest>
