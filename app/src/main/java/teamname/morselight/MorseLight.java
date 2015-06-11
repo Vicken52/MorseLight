@@ -26,6 +26,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MorseLight extends ActionBarActivity {
@@ -40,6 +41,10 @@ public class MorseLight extends ActionBarActivity {
     private MediaPlayer b = null, l = null, p = null;
     Camera camera = Camera.open();
     Parameters parameters = camera.getParameters();
+    BroadcastReceiver battery = null;
+    IntentFilter ifilter = null;
+    Intent batteryStatus = null;
+    Thread threading = null;
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
@@ -76,6 +81,9 @@ public class MorseLight extends ActionBarActivity {
         decode = (TextView) findViewById(R.id.MorseCodeDecode);
         button = (Button) findViewById(R.id.button);
         switch1 = (Switch) findViewById(R.id.switch1);
+        ifilter =  new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = MorseLight.this.registerReceiver(null, ifilter);
+        threading = new Thread();
 
         createBeep();
         createLongBeep();
@@ -108,40 +116,55 @@ public class MorseLight extends ActionBarActivity {
             public void onClick(View v) {
                 String text = plain.getText().toString().trim();
                 encode = "";
-                if (!text.isEmpty()) {
-                    MorseCode code = new MorseCode();
-                    encode = code.encode(text);
-                    long duration = 0;
+                if(button.getText().toString().equalsIgnoreCase("encode")){
+                    button.setText("stop");
+                    if (!text.isEmpty()) {
+                        MorseCode code = new MorseCode();
+                        encode = code.encode(text);
+                        long duration = 0;
 
-                    if (light) {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playLights(encode);
-                            }
-                        }).start();
-                    } else {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playSounds(encode);
-                            }
-                        }).start();
+                        if (light) {
+                            threading = new Thread(new Runnable() {
+                                public void run() {
+                                    playLights(encode);
+                                }
+                            });
+                            threading.start();
+                        } else {
+                            threading = new Thread(new Runnable() {
+                                public void run() {
+                                    playSounds(encode);
+                                }
+                            });
+                            threading.start();
+                        }
                     }
+                }else{
+                    button.setText("encode");
                 }
+
             }
         });
 
         switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {
-                    switch1.setText("Light");
-                    light = true;
-                }
-                else
-                {
-                    switch1.setText("Sound");
-                    light = true;
+                if (isChecked) {
+                    int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                    //Toast.makeText(MorseLight.this, "Battery "+level, Toast.LENGTH_LONG).show();
+
+                    if(level <= 15){
+                        Toast.makeText(MorseLight.this, "Battery is too low to use the flash.", Toast.LENGTH_LONG).show();
+                        light = false;
+                        switch1.setChecked(false);
+                    }else{
+                        //switch1.setText("Light");
+                        light = true;
+                    }
+
+                } else {
+                    //switch1.setText("Sound");
+                    light = false;
                 }
             }
         });
