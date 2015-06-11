@@ -114,12 +114,24 @@ public class AudioActivity extends ActionBarActivity {
             dispatcher.addAudioProcessor(p);
             new Thread(dispatcher, "Audio Dispatcher").start();
         }else{
-            isDetecting = false;
-            detectButton.setText("START DETECTING");
-            if (dispatcher != null) {
-                dispatcher.removeAudioProcessor(p);
-                dispatcher.stop();  // this will stop audio processing
-            }
+            stopAudioProcess();
+        }
+    }
+
+    // stop current audio process
+    public void stopAudioProcess(){
+        isDetecting = false;
+        detectButton.setText("START DETECTING");
+        if (dispatcher != null) {
+            dispatcher.removeAudioProcessor(p);
+            dispatcher.stop();  // this will stop audio processing
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isDetecting){
+            stopAudioProcess();
         }
     }
 
