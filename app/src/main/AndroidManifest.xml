@@ -10,18 +10,14 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher2"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MorseLight"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:windowSoftInputMode="stateHidden">
+			android:screenOrientation="portrait">
         </activity>
 
         <meta-data
@@ -33,13 +29,24 @@
             android:value=""
             />
         <activity
+            android:name=".SplashActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".AudioActivity"
             android:label="@string/title_activity_audio"
+            android:windowSoftInputMode="stateHidden">
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".LightActivity"
             android:label="@string/title_activity_light"
+            android:windowSoftInputMode="stateHidden">
             android:screenOrientation="portrait">
         </activity>
         <activity
@@ -68,4 +75,12 @@
             android:screenOrientation="portrait">
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+
 </manifest>

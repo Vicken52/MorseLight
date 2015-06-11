@@ -10,6 +10,11 @@
     <string name="title_activity_light">LightActivity</string>
     <string name="action_help">Help</string>
     <string name="action_about">About</string>
+    <string name="light_switch">Light</string>
+    <string name="sound_switch">Sound</string>
+    <string name="start">start</string>
+    <string name="encode">encode</string>
+    <string name="title_activity_splash">Splash Screen</string>
 
     <string name="title_activity_help1">What Is Morse Code</string>
     <string name="help1_text">
