@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ public class LightActivity extends ActionBarActivity {
     private MediaPlayer b = null, l = null;
 
     // Detect low battery level and create a DialogInterface warning
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -57,15 +58,19 @@ public class LightActivity extends ActionBarActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
-                        + "The flash is disabled. Please charge the device.");
+                        + "The light is disabled. "
+                        + "Please charge the device in order to use the light again.");
                 builder.setCancelable(true);
                 builder.setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
+                                dialog.dismiss();
+                                MorseLight.switch1 = (Switch) findViewById(R.id.switch1);
+                                MorseLight.switch1.setEnabled(false);
+                                Intent intent = new Intent(LightActivity.this, MorseLight.class);
+                                startActivity(intent);
                             }
                         });
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }

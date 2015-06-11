@@ -36,7 +36,7 @@ public class MorseLight extends ActionBarActivity {
     private EditText plain;
     private TextView morse, decode;
     private Button button;
-    private Switch switch1;
+    static Switch switch1;
     private String encode = "";
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null, p = null;
