@@ -84,9 +84,18 @@
         \n@\t\t.--.-</b></p>
     </string>
     <string name="title_activity_help3">How to Use MorseLight</string>
-    <string name="help3_text">1. Input your message in the text box.
+    <string name="help3_text">You have the option to encode your message by either through sound or the flash light (if your device has one) with a switch.
+        \nFor sound encoding:
+        \n1. Input your message in the text box.
+        \n2. Press the signal button to start the translation.
+        \n3. A series of beeping sound will be played based on the morse code.
+        \n4. If you want to decode the beeping code from another device, press the circle buttonon the top.
+        \n5. By clicking the astart decoding button, the decoded message along with the morse code will be displayed in real time.
+        \nFor flash encoding:
+        \n1.Input your message in the text box.
         \n2. Press the signal button to start the translation.
         \n3. The LED flash on the device flashes based on the morse code.
-        \nWarning: The flash stops working if the battery is low.
+        \m4. If you want to decode the flash light from another device, press the circle button on the top.
+        \nWarning: The sound-light switch will be grayed out if the battery level is low..
     </string>
 </resources>

@@ -1,6 +1,7 @@
 package teamname.morselight;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,17 +51,23 @@ public class MorseLight extends ActionBarActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
-                        + "The flash is disabled. Please charge the device.");
+                        + "The light is disabled. "
+                        + "Please charge the device in order to use the light again.");
                 builder.setCancelable(true);
                 builder.setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
+                                dialog.dismiss();
+                                switch1 = (Switch) findViewById(R.id.switch1);
+                                switch1.setEnabled(false);
                             }
                         });
-
                 AlertDialog alert = builder.create();
                 alert.show();
+                }
+            if (batteryLevel > 10) {
+                switch1 = (Switch)findViewById(R.id.switch1);
+                switch1.setEnabled(true);
             }
         }
     };
