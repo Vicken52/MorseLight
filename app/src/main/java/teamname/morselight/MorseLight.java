@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -28,6 +29,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MorseLight extends ActionBarActivity {
@@ -40,6 +42,7 @@ public class MorseLight extends ActionBarActivity {
     private String encode = "";
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null, p = null;
+    boolean isLighOn = false;
     Camera camera = Camera.open();
     Parameters parameters = camera.getParameters();
 
@@ -65,7 +68,7 @@ public class MorseLight extends ActionBarActivity {
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
-                }
+            }
             if (batteryLevel > 10) {
                 switch1 = (Switch)findViewById(R.id.switch1);
                 switch1.setEnabled(true);
@@ -87,6 +90,21 @@ public class MorseLight extends ActionBarActivity {
         createBeep();
         createLongBeep();
         createPause();
+
+        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
+        {
+            Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
+            try {
+                camera = Camera.open();
+                parameters = camera.getParameters();
+            } catch (RuntimeException e) {
+                Log.e("Camera error: ", e.getMessage());
+            }
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
+        }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
@@ -121,11 +139,30 @@ public class MorseLight extends ActionBarActivity {
                     long duration = 0;
 
                     if (light) {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playLights(encode);
-                            }
-                        }).start();
+                        if (isLighOn) {
+
+                            Log.i("info", "torch is turn off!");
+
+                            parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                            camera.setParameters(parameters);
+                            camera.stopPreview();
+                            isLighOn = false;
+
+                        } else {
+
+                            Log.i("info", "torch is turn on!");
+
+                            parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                            camera.setParameters(parameters);
+                            camera.startPreview();
+                            isLighOn = true;
+
+                        }
+//                        new Thread(new Runnable() {
+//                            public void run() {
+//                                playLights(encode);
+//                            }
+//                        }).start();
                     } else {
                         new Thread(new Runnable() {
                             public void run() {
@@ -183,22 +220,33 @@ public class MorseLight extends ActionBarActivity {
     }
 
     public void playLights(String text) {
-        parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(parameters);
-
         for (int i = 0; i < text.length(); i++)
         {
             if (text.charAt(i) == '.')
             {
-                camera.startPreview();
-                SystemClock.sleep(200);
-                camera.stopPreview();
+                try {
+                    parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(parameters);
+                    camera.startPreview();
+                    Thread.sleep(250, 0);
+                    camera.stopPreview();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else if (text.charAt(i) == '-')
             {
-                camera.startPreview();
-                SystemClock.sleep(500);
-                camera.stopPreview();
+                try {
+                    parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(parameters);
+                    camera.startPreview();
+                    Thread.sleep(750, 0);
+                    camera.stopPreview();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else if (text.charAt(i) == '/')
             {
