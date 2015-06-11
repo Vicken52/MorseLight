@@ -65,7 +65,7 @@ public class MorseLight extends ActionBarActivity {
                 AlertDialog alert = builder.create();
                 alert.show();
                 }
-            if (batteryLevel > 100) {
+            if (batteryLevel > 10) {
                 switch1 = (Switch)findViewById(R.id.switch1);
                 switch1.setEnabled(true);
             }
