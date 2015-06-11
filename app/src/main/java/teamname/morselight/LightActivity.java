@@ -185,14 +185,20 @@ public class LightActivity extends ActionBarActivity {
             public void onClick(View v) {
                 String text = plain.getText().toString().trim();
                 encode = "";
-                if(button.getText().toString().equalsIgnoreCase("start")){
-                    // Start grabbing light
-                    button.setText("stop");
-                }else{
-                    // Do Nothing
-                    button.setText("start");
+                if (!text.isEmpty()) {
+                    MorseCode code = new MorseCode();
+                    encode = code.encode(text);
+                    if (aManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                        long duration = 0;
+                        new Thread(new Runnable() {
+                            public void run() {
+                                playSounds(encode);
+                            }
+                        }).start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG).show();
+                    }
                 }
-
             }
         });
 
