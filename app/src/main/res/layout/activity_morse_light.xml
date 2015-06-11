@@ -4,63 +4,45 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MorseLight"
-    style="@style/background_color">
+    android:background="#ff6e79ff">
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:id="@+id/PlainText"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:background="#ffffff"
-        android:hint="Enter message to encode here: "
-        android:textSize="18dp"
-        android:maxLines="5"
-        android:scrollbars="vertical"/>
+        android:hint="Enter message here: "
+        android:layout_above="@+id/button" />
 
-    <LinearLayout
-        android:layout_width="fill_parent"
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/PlainText"
-        android:orientation="horizontal"
-        android:id="@+id/lin_layout"
-        android:weightSum="1.0">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/encode"
-            android:id="@+id/button"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/switch1"
-            android:background="@drawable/red_button"
-            style="@style/button_text"
-            android:layout_weight=".75"/>
+        android:text="@string/Signal"
+        android:id="@+id/button"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/switch1" />
 
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/switch1"
-            android:textOff="@string/sound_switch"
-            android:textOn="@string/light_switch"
-            android:layout_alignBottom="@+id/button"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/PlainText"
-            android:textSize="18dp"
-            android:layout_weight=".25"/>
-    </LinearLayout>
-
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Sound"
+        android:id="@+id/switch1"
+        android:layout_alignBottom="@+id/button"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/PlainText" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Default"
         android:id="@+id/MorseCode"
-        android:layout_below="@+id/lin_layout"
+        android:layout_below="@+id/button"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:textSize="36sp"
-        style="@style/main_text"/>
+        android:textSize="36sp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -71,7 +53,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:textSize="36sp"
-        android:layout_below="@+id/MorseCode"
-        style="@style/main_text"/>
+        android:layout_below="@+id/MorseCode" />
 
 </RelativeLayout>
