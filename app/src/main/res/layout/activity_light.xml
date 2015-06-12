@@ -35,11 +35,10 @@
         android:layout_height="wrap_content"
         android:text="@string/Default"
         android:id="@+id/MorseCode"
-        android:layout_below="@+id/button"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
         android:textSize="36sp"
-        style="@style/main_text"/>
+        style="@style/main_text"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/button" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,6 +58,14 @@
         android:layout_above="@+id/PlainText"
         android:id="@+id/cameraPreview"
         android:layout_centerHorizontal="true"></FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light Quantity"
+        android:id="@+id/textView"
+        android:layout_below="@+id/button"
+        android:layout_alignStart="@+id/MorseCode" />
 
 
 </RelativeLayout>

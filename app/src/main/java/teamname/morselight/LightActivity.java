@@ -38,6 +38,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 
 
@@ -51,7 +53,7 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
     private Camera mCamera;
     private CameraPreview mPreview;
     private Camera.Parameters cParameters;
-    private boolean cameraFront = false, isDialogShowed;
+    private boolean cameraFront = false, isDialogShowed, isDetecting;
 
     private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
@@ -104,6 +106,7 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
             }
             mPreview.resume(mCamera);
             this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -179,6 +182,7 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
 
         createBeep();
         createLongBeep();
+        isDetecting = false;
 
         if (checkCameraHardware(this.getApplicationContext())){
             mCamera = getCameraInstance();
@@ -236,15 +240,17 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
 
                 if (button.getText().toString().equalsIgnoreCase("start")){
                     button.setText("stop");
-                    lightThread = new Thread(new Runnable(){
-                        public void run() {
-                            getLight();
-                        }
-                    });
-                    lightThread.start();
+                    isDetecting = true;
+//                    lightThread = new Thread(new Runnable(){
+//                        public void run() {
+//                            getLight();
+//                        }
+//                    });
+//                    lightThread.start();
                 }else{
                     button.setText("start");
-                    lightThread.interrupt();
+                    isDetecting = false;
+//                    lightThread.interrupt();
                 }
 
             }
@@ -256,20 +262,27 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        float lightQuantity = event.values[0];
-        Log.e("lightQUan", "Q; "+lightQuantity);
+        if (isDetecting) {
+            float lightQuantity = event.values[0];
+            Log.e("lightQUan", "Q; " + lightQuantity);
+            TextView tv = (TextView) findViewById(R.id.textView);
+            tv.setText("light quantity: " + lightQuantity);
+        }
         // Do something with this sensor data.
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        Log.e("lightQUan", "Q; "+lightQuantity);
+        if (isDetecting) {
+            Log.e("lightQUan", "Q; " + lightQuantity);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         this.unregisterReceiver(this.mBatInfoReceiver);
+        mSensorManager.unregisterListener(this);
         mPreview.pause();
         mCamera.release();
         mCamera = null;
