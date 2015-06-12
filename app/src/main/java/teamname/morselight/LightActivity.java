@@ -79,9 +79,9 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
-                                MorseLight.switch1 = (Switch) findViewById(R.id.switch1);
-                                MorseLight.switch1.setEnabled(false);
-                                MorseLight.switch1.setChecked(false);
+//                                MorseLight.switch1 = (Switch) findViewById(R.id.switch1); these caused crash
+//                                MorseLight.switch1.setEnabled(false);
+//                                MorseLight.switch1.setChecked(false);
                                 Intent intent = new Intent(LightActivity.this, MorseLight.class);
                                 isDialogShowed = true;
                                 startActivity(intent);
@@ -202,7 +202,7 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
                 cParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                 Log.e("FOCUS MODE", "Set to cont picture");
             }
-            mCamera.setParameters(cParameters);
+            //mCamera.setParameters(cParameters);
             FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
             preview.addView(mPreview);
         }else{
