@@ -35,7 +35,7 @@
             android:layout_toStartOf="@+id/switch1"
             android:background="@drawable/red_button"
             style="@style/button_text"
-            android:layout_weight=".75"/>
+            android:layout_weight=".9"/>
 
         <Switch
             android:layout_width="wrap_content"
@@ -47,8 +47,8 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/PlainText"
             android:textSize="18dp"
-            android:layout_weight=".25"
-            android:showText="true" />
+            android:showText="true"
+            android:checked="false" />
     </LinearLayout>
 
 

@@ -8,9 +8,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.ImageFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
@@ -34,7 +40,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 
-public class LightActivity extends ActionBarActivity {
+public class LightActivity extends ActionBarActivity implements SensorEventListener {
     TextWatcher input = null;
     private EditText plain;
     private TextView morse, decode;
@@ -43,10 +49,17 @@ public class LightActivity extends ActionBarActivity {
     private AudioManager aManager = null;
     private Camera mCamera;
     private CameraPreview mPreview;
+    private Camera.Parameters cParameters;
     private boolean cameraFront = false;
     private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null;
+    private Thread lightThread;
+    private int centerX, centerY;
+    private FrameLayout fLayout;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private float lightQuantity;
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
@@ -150,6 +163,10 @@ public class LightActivity extends ActionBarActivity {
         button.requestFocus();
         aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         volume = (float) aManager.getStreamVolume(AudioManager.STREAM_RING);
+        fLayout = (FrameLayout) findViewById(R.id.cameraPreview);
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
 
         createBeep();
         createLongBeep();
@@ -157,6 +174,26 @@ public class LightActivity extends ActionBarActivity {
         if (checkCameraHardware(this.getApplicationContext())){
             mCamera = getCameraInstance();
             mPreview = new CameraPreview(this, mCamera);
+            int x = (int) mPreview.getX();
+            int y = (int) mPreview.getY();
+            int width = mPreview.getWidth();
+            int height = mPreview.getHeight();
+            centerX = x + width/2;
+            centerY = y + height/2;
+            cParameters = mCamera.getParameters();
+            cParameters.setAutoExposureLock(true);
+            cParameters.setPreviewFormat(ImageFormat.NV21);
+            cParameters.setPictureFormat(ImageFormat.NV21);
+            if (cParameters.getSupportedFocusModes().contains(
+                    Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                cParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                Log.e("FOCUS MODE", "Set to cont video");
+            } else if (cParameters.getSupportedFocusModes().contains(
+                    Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)){
+                cParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                Log.e("FOCUS MODE", "Set to cont picture");
+            }
+            mCamera.setParameters(cParameters);
             FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
             preview.addView(mPreview);
         }else{
@@ -187,27 +224,37 @@ public class LightActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = plain.getText().toString().trim();
-                encode = "";
-                if (!text.isEmpty()) {
-                    MorseCode code = new MorseCode();
-                    encode = code.encode(text);
-                    if (aManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-                        long duration = 0;
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playSounds(encode);
-                            }
-                        }).start();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "You cannot play tone while phone is silent", Toast.LENGTH_LONG).show();
-                    }
+
+                if (button.getText().toString().equalsIgnoreCase("start")){
+                    button.setText("stop");
+                    lightThread = new Thread(new Runnable(){
+                        public void run() {
+                            getLight();
+                        }
+                    });
+                    lightThread.start();
+                }else{
+                    button.setText("start");
+                    lightThread.interrupt();
                 }
+
             }
         });
 
         // Display the low battery warning DialogInterface
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    @Override
+    public final void onSensorChanged(SensorEvent event) {
+        float lightQuantity = event.values[0];
+        Log.e("lightQUan", "Q; "+lightQuantity);
+        // Do something with this sensor data.
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        Log.e("lightQUan", "Q; "+lightQuantity);
     }
 
     @Override
@@ -217,6 +264,24 @@ public class LightActivity extends ActionBarActivity {
         mPreview.pause();
         mCamera.release();
         mCamera = null;
+    }
+
+    public void getLight(){
+        while(true){
+            try {
+                lightThread.sleep(1000);
+                cParameters = mCamera.getParameters();
+                Log.e("CAMERA PARAM", "Exposure Comp: " + cParameters.getExposureCompensation());
+                //Log.e("CAMERA PARAM", "Exposure Comp: "+cParameters.get());
+            }catch(Exception e) {
+                Log.d("getLight", "thread sleep failed");
+                break;
+            }
+            if (button.getText().toString().equalsIgnoreCase("start")){
+                Log.i("getLight", "button pushed to stop");
+                break;
+            }
+        }
     }
 
     public void playSounds(String text){
