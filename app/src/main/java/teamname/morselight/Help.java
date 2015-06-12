@@ -69,9 +69,9 @@ public class Help extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -82,7 +82,7 @@ public class Help extends ActionBarActivity {
         switch(back){
             case "main":
                 i = new Intent(Help.this, MorseLight.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 break;
             case "light":
