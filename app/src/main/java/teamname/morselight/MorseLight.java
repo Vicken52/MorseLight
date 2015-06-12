@@ -353,7 +353,7 @@ public class MorseLight extends ActionBarActivity {
             intent.putExtra("backButton", "main");
             startActivity(intent);
         } else if (id == R.id.decode_setting) {
-            boolean testing = false;
+            boolean testing = true;
             if (testing) {
                 if (camera != null) {
                     camera.release();

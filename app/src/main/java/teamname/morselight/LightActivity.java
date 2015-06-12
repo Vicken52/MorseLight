@@ -41,6 +41,7 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 
 public class LightActivity extends ActionBarActivity implements SensorEventListener {
@@ -63,7 +64,11 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
     private FrameLayout fLayout;
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private float lightQuantity;
+
+    //================ LIGHT SENSOR STUFF ===========
+    boolean gotLight, needUIUpdate;
+    long lightStartTime,lightEndTime, currentTime, lightDuration, silenceStartTime, silenceDuration;
+    float lightQuantityLevel, lightQuantity;
 
     // Detect low battery level and create a DialogInterface warning
     private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
@@ -241,6 +246,17 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
                 if (button.getText().toString().equalsIgnoreCase("start")){
                     button.setText("stop");
                     isDetecting = true;
+                    // set up for light detection
+                    lightQuantityLevel = 100;   // object to change
+                    lightDuration = 0;
+                    lightQuantity = 0;
+                    gotLight = false;
+                    silenceStartTime = Calendar.getInstance().getTimeInMillis();
+                    TextView morseTv = (TextView)findViewById(R.id.MorseCode);
+                    morseTv.setText("Morse code: ");
+                    TextView decodeTv = (TextView)findViewById(R.id.MorseCodeDecode);
+                    decodeTv.setText("Decode message: ");
+
 //                    lightThread = new Thread(new Runnable(){
 //                        public void run() {
 //                            getLight();
@@ -260,13 +276,51 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
+    // light detection using light sensor
     @Override
     public final void onSensorChanged(SensorEvent event) {
         if (isDetecting) {
-            float lightQuantity = event.values[0];
-            Log.e("lightQUan", "Q; " + lightQuantity);
+            lightQuantity = event.values[0];
+//            Log.e("lightQUan", "Q; " + lightQuantity);
             TextView tv = (TextView) findViewById(R.id.textView);
             tv.setText("light quantity: " + lightQuantity);
+            if (lightQuantity > lightQuantityLevel && !gotLight){
+                lightStartTime = Calendar.getInstance().getTimeInMillis();
+                silenceDuration = lightStartTime - silenceStartTime;
+                gotLight = true;
+                needUIUpdate = true;
+            }else if (lightQuantity < lightQuantityLevel && gotLight){
+                currentTime = Calendar.getInstance().getTimeInMillis();
+                lightDuration = currentTime - lightStartTime;
+                lightStartTime = currentTime;
+                gotLight = false;
+                silenceStartTime = currentTime;
+                needUIUpdate = true;
+            }
+
+            // if there is chance that need to update to GUI
+            if (needUIUpdate){
+                if (gotLight){
+                    TextView lightTv = (TextView)findViewById(R.id.textView2);
+                    lightTv.setText("Light Duration: " + lightDuration);
+                    TextView morseTv = (TextView)findViewById(R.id.MorseCode);
+                    morseTv.append(beepToMorse(lightDuration));
+                    TextView decodeTv = (TextView)findViewById(R.id.MorseCodeDecode);
+                    decodeTv.setText(MorseCode.decodeAll(morseTv.getText().toString()));
+                }else{
+                    TextView darkTv = (TextView)findViewById(R.id.textView3);
+                    darkTv.setText("Dark Duration: " + silenceDuration);
+                    TextView morseTv = (TextView)findViewById(R.id.MorseCode);
+                    if (isNewChar(silenceDuration)){
+                        morseTv.append(" ");
+                    }
+                    if (isNewWord(silenceDuration)) {
+                        morseTv.append(" / ");
+                    }
+                    needUIUpdate = false;
+                }
+
+            }
         }
         // Do something with this sensor data.
     }
@@ -398,4 +452,24 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
         return super.onOptionsItemSelected(item);
     }
 
+    //================ DURATION TO MORSE =============
+    private boolean isNewWord(long ms){
+        if (ms > 1900l && ms < 2800l)
+            return true;
+        return false;
+    }
+
+    private boolean isNewChar(long ms){
+        if (ms > 600l && ms < 1400l)
+            return true;
+        return false;
+    }
+
+    private String beepToMorse(long ms){
+        if (ms > 180l && ms < 300l)
+            return ".";
+        if (ms > 600l && ms < 850l)
+            return "-";
+        return "";
+    }
 }
