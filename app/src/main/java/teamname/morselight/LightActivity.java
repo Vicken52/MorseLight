@@ -34,6 +34,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +51,8 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
     private Camera mCamera;
     private CameraPreview mPreview;
     private Camera.Parameters cParameters;
-    private boolean cameraFront = false;
+    private boolean cameraFront = false, isDialogShowed;
+
     private float volume = 0.0f;
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null;
@@ -62,23 +64,29 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
     private float lightQuantity;
 
     // Detect low battery level and create a DialogInterface warning
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            if (batteryLevel <= 10) {
+            if (batteryLevel <= 10 && !isDialogShowed) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
-                        + "The flash is disabled. Please charge the device.");
+                        + "The light is disabled. "
+                        + "Please charge the device in order to use the light again.");
                 builder.setCancelable(true);
                 builder.setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
+                                dialog.dismiss();
+                                MorseLight.switch1 = (Switch) findViewById(R.id.switch1);
+                                MorseLight.switch1.setEnabled(false);
+                                MorseLight.switch1.setChecked(false);
+                                Intent intent = new Intent(LightActivity.this, MorseLight.class);
+                                isDialogShowed = true;
+                                startActivity(intent);
                             }
                         });
-
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -88,6 +96,7 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
     @Override
     protected void onResume() {
         super.onResume();
+        isDialogShowed = false;
         //setContentView(R.layout.activity_light);
         try {
             if (mCamera == null){

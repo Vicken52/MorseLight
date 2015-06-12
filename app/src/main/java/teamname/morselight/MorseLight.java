@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -28,18 +29,20 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
-    private boolean light;
+    private boolean light, isDialogShowed;
     private EditText plain;
     private TextView morse, decode;
     private Button button;
-    private Switch switch1;
+    static Switch switch1;
     private String encode = "";
     final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
     private MediaPlayer b = null, l = null, p = null;
+    boolean isLighOn = false;
     Camera camera = Camera.open();
     Parameters parameters = camera.getParameters();
 
@@ -48,7 +51,7 @@ public class MorseLight extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            if (batteryLevel <= 10) {
+            if (batteryLevel <= 10 && !isDialogShowed) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Battery is low. " + batteryLevel
                         + "% of battery remaining. "
@@ -61,14 +64,17 @@ public class MorseLight extends ActionBarActivity {
                                 dialog.dismiss();
                                 switch1 = (Switch) findViewById(R.id.switch1);
                                 switch1.setEnabled(false);
+                                switch1.setChecked(false);  // force it to sound
                             }
                         });
                 AlertDialog alert = builder.create();
+                isDialogShowed = true;
                 alert.show();
-                }
-            if (batteryLevel > 10) {
+            }
+            else if (batteryLevel > 10) {
                 switch1 = (Switch)findViewById(R.id.switch1);
                 switch1.setEnabled(true);
+                isDialogShowed = false;
             }
         }
     };
@@ -87,6 +93,21 @@ public class MorseLight extends ActionBarActivity {
         createBeep();
         createLongBeep();
         createPause();
+        isDialogShowed = false;
+        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
+        {
+            Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
+            try {
+                camera = Camera.open();
+                parameters = camera.getParameters();
+            } catch (RuntimeException e) {
+                Log.e("Camera error: ", e.getMessage());
+            }
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
+        }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
         input = new TextWatcher() {
@@ -121,6 +142,10 @@ public class MorseLight extends ActionBarActivity {
                     long duration = 0;
 
                     if (light) {
+                        if (camera == null) { // check if camera is available
+                            camera = getCameraInstance();
+                            parameters = camera.getParameters();
+                        }
                         new Thread(new Runnable() {
                             public void run() {
                                 playLights(encode);
@@ -183,22 +208,37 @@ public class MorseLight extends ActionBarActivity {
     }
 
     public void playLights(String text) {
-        parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(parameters);
-
         for (int i = 0; i < text.length(); i++)
         {
             if (text.charAt(i) == '.')
             {
-                camera.startPreview();
-                SystemClock.sleep(200);
-                camera.stopPreview();
+                try {
+                    parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(parameters);
+                    camera.startPreview();
+                    Thread.sleep(250, 0);
+                    parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(parameters);
+                    camera.stopPreview();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else if (text.charAt(i) == '-')
             {
-                camera.startPreview();
-                SystemClock.sleep(500);
-                camera.stopPreview();
+                try {
+                    parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(parameters);
+                    camera.startPreview();
+                    Thread.sleep(750, 0);
+                    parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(parameters);
+                    camera.stopPreview();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else if (text.charAt(i) == '/')
             {
@@ -299,7 +339,10 @@ public class MorseLight extends ActionBarActivity {
             startActivity(intent);
         } else if (id == R.id.decode_setting) {
             if (light) {
-                camera.release();
+                if (camera != null) {
+                    camera.release();
+                    camera = null;
+                }
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
@@ -317,12 +360,27 @@ public class MorseLight extends ActionBarActivity {
     protected void onStop() {
         super.onStop();
         Log.i("HELP", "this is where the onStop is played");
-        camera.release();
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         Log.d("HELP", "this is where the onRestart is played");
+    }
+
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try{
+            c = Camera.open();
+            Camera.Parameters param = c.getParameters();
+            Log.v("param", param.toString());
+        } catch(Exception e){
+
+        }
+        return c;
     }
 }
