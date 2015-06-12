@@ -15,6 +15,7 @@
     <string name="start">start</string>
     <string name="encode">encode</string>
     <string name="title_activity_splash">Splash Screen</string>
+    <string name="desc">In this app you will be able to write a message and encode it into morse code.</string>
 
     <string name="title_activity_help1">What Is Morse Code</string>
     <string name="help1_text">
