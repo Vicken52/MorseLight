@@ -142,30 +142,15 @@ public class MorseLight extends ActionBarActivity {
                     long duration = 0;
 
                     if (light) {
-                        if (isLighOn) {
-
-                            Log.i("info", "torch is turn off!");
-
-                            parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
-                            camera.setParameters(parameters);
-                            camera.stopPreview();
-                            isLighOn = false;
-
-                        } else {
-
-                            Log.i("info", "torch is turn on!");
-
-                            parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
-                            camera.setParameters(parameters);
-                            camera.startPreview();
-                            isLighOn = true;
-
+                        if (camera == null) { // check if camera is available
+                            camera = getCameraInstance();
+                            parameters = camera.getParameters();
                         }
-//                        new Thread(new Runnable() {
-//                            public void run() {
-//                                playLights(encode);
-//                            }
-//                        }).start();
+                        new Thread(new Runnable() {
+                            public void run() {
+                                playLights(encode);
+                            }
+                        }).start();
                     } else {
                         new Thread(new Runnable() {
                             public void run() {
@@ -232,6 +217,8 @@ public class MorseLight extends ActionBarActivity {
                     camera.setParameters(parameters);
                     camera.startPreview();
                     Thread.sleep(250, 0);
+                    parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(parameters);
                     camera.stopPreview();
                 }
                 catch (InterruptedException e) {
@@ -245,6 +232,8 @@ public class MorseLight extends ActionBarActivity {
                     camera.setParameters(parameters);
                     camera.startPreview();
                     Thread.sleep(750, 0);
+                    parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(parameters);
                     camera.stopPreview();
                 }
                 catch (InterruptedException e) {
@@ -350,7 +339,10 @@ public class MorseLight extends ActionBarActivity {
             startActivity(intent);
         } else if (id == R.id.decode_setting) {
             if (light) {
-                camera.release();
+                if (camera != null) {
+                    camera.release();
+                    camera = null;
+                }
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
@@ -368,12 +360,27 @@ public class MorseLight extends ActionBarActivity {
     protected void onStop() {
         super.onStop();
         Log.i("HELP", "this is where the onStop is played");
-        camera.release();
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         Log.d("HELP", "this is where the onRestart is played");
+    }
+
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try{
+            c = Camera.open();
+            Camera.Parameters param = c.getParameters();
+            Log.v("param", param.toString());
+        } catch(Exception e){
+
+        }
+        return c;
     }
 }
