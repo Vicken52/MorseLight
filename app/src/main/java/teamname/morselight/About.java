@@ -1,5 +1,6 @@
 package teamname.morselight;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,10 +9,20 @@ import android.view.MenuItem;
 
 public class About extends ActionBarActivity {
 
+    private Intent intent;
+    private String back = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+
+        intent = getIntent();
+        if(intent.getStringExtra("backButton").isEmpty()){
+            back = "main";
+        }else{
+            back = intent.getStringExtra("backButton");
+        }
     }
 
     @Override
@@ -34,5 +45,28 @@ public class About extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i;
+        switch(back){
+            case "main":
+                i = new Intent(About.this, MorseLight.class);
+                //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                break;
+            case "light":
+                i = new Intent(About.this, LightActivity.class);
+                //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+                break;
+            case "audio":
+                i = new Intent(About.this, AudioActivity.class);
+                //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+                break;
+        }
     }
 }

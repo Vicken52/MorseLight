@@ -142,15 +142,20 @@ public class MorseLight extends ActionBarActivity {
                     long duration = 0;
 
                     if (light) {
-                        if (camera == null) { // check if camera is available
-                            camera = getCameraInstance();
-                            parameters = camera.getParameters();
-                        }
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playLights(encode);
+                        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                            if (camera == null) { // check if camera is available
+                                camera = getCameraInstance();
+                                parameters = camera.getParameters();
                             }
-                        }).start();
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    playLights(encode);
+                                }
+                            }).start();
+                        }else{
+                            Toast.makeText(MorseLight.this, "Unable to detect your flash. Switching back to sound.", Toast.LENGTH_LONG).show();
+                            switch1.setChecked(false);
+                        }
                     } else {
                         new Thread(new Runnable() {
                             public void run() {
@@ -333,9 +338,11 @@ public class MorseLight extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_help) {
             Intent intent = new Intent(MorseLight.this, Help.class);
+            intent.putExtra("backButton", "main");
             startActivity(intent);
         } else if (id == R.id.action_about) {
             Intent intent = new Intent(MorseLight.this, About.class);
+            intent.putExtra("backButton", "main");
             startActivity(intent);
         } else if (id == R.id.decode_setting) {
             if (light) {
@@ -344,11 +351,11 @@ public class MorseLight extends ActionBarActivity {
                     camera = null;
                 }
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(MorseLight.this, AudioActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             }
         }

@@ -35,4 +35,6 @@ public class Help3 extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

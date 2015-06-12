@@ -369,17 +369,20 @@ public class LightActivity extends ActionBarActivity implements SensorEventListe
         if (id == R.id.action_help_light) {
             Intent intent = new Intent(LightActivity.this, Help.class);
             mCamera.release();
+            intent.putExtra("backButton", "light");
             startActivity(intent);
         } else if (id == R.id.action_about_light) {
             Intent intent = new Intent(LightActivity.this, About.class);
             mCamera.release();
+            intent.putExtra("backButton", "light");
             startActivity(intent);
         } else if (id == R.id.encode_setting_light){
             Intent intent = new Intent(LightActivity.this, MorseLight.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }

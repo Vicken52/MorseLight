@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1.0">
 
     <TextView
         android:id="@+id/about"
@@ -43,8 +44,21 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:text="MorseLight is an app that lets you transmit text information as series of on-off tones, light by using light,sound or electrical pulse. It is a way of communication other than the typical, text, email and social media. It is useful insituation where no mobile service is provided. If you enjoy using our app, please give a 5 star rating on Google Play. Stay tune for other apps."
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/team_logo"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/about_logo"
+        android:layout_marginTop="20dp"
+        android:layout_weight=".8"/>
+
+
 </LinearLayout>
