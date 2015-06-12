@@ -99,7 +99,7 @@
         \n1.Input your message in the text box.
         \n2. Press the signal button to start the translation.
         \n3. The LED flash on the device flashes based on the morse code.
-        \m4. If you want to decode the flash light from another device, press the icon on the top right of title bar to get to decoding screen.
+        \n4. If you want to decode the flash light from another device, press the icon on the top right of title bar to get to decoding screen.
         \n
         \n***Warning: The sound-light switch will be grayed out if the battery level is low.
     </string>
