@@ -12,10 +12,20 @@ import android.widget.ListView;
 
 public class Help extends ActionBarActivity {
 
+    private Intent intent;
+    private String back = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
+
+        intent = getIntent();
+        if(intent.getStringExtra("backButton").isEmpty()){
+            back = "main";
+        }else{
+            back = intent.getStringExtra("backButton");
+        }
+
         String[] items = {"What is morse code", "Morse code chart",
                 "How to use MorseLight"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -59,10 +69,32 @@ public class Help extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i;
+        switch(back){
+            case "main":
+                i = new Intent(Help.this, MorseLight.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                break;
+            case "light":
+                i = new Intent(Help.this, LightActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+                break;
+            case "audio":
+                i = new Intent(Help.this, AudioActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(i);
+                break;
+        }
     }
 }

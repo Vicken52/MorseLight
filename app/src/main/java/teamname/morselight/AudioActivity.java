@@ -33,7 +33,6 @@ public class AudioActivity extends ActionBarActivity {
 
     private String fileName;
     private Button detectButton;
-
     private TextView decodedMessage;
 
     /*==================================================
@@ -190,16 +189,19 @@ public class AudioActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_help_audio) {
             Intent intent = new Intent(AudioActivity.this, Help.class);
+            intent.putExtra("backButton", "audio");
             startActivity(intent);
         } else if (id == R.id.action_about_audio) {
             Intent intent = new Intent(AudioActivity.this, About.class);
+            intent.putExtra("backButton", "audio");
             startActivity(intent);
         } else if (id == R.id.encode_setting_audio){
             Intent intent = new Intent(AudioActivity.this, MorseLight.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }

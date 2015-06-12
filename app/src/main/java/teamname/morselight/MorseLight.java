@@ -31,6 +31,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
@@ -96,7 +98,7 @@ public class MorseLight extends ActionBarActivity {
         isDialogShowed = false;
         if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
         {
-            Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
             try {
                 camera = Camera.open();
                 parameters = camera.getParameters();
@@ -106,7 +108,7 @@ public class MorseLight extends ActionBarActivity {
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
         }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
@@ -142,15 +144,20 @@ public class MorseLight extends ActionBarActivity {
                     long duration = 0;
 
                     if (light) {
-                        if (camera == null) { // check if camera is available
-                            camera = getCameraInstance();
-                            parameters = camera.getParameters();
-                        }
-                        new Thread(new Runnable() {
-                            public void run() {
-                                playLights(encode);
+                        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                            if (camera == null) { // check if camera is available
+                                camera = getCameraInstance();
+                                parameters = camera.getParameters();
                             }
-                        }).start();
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    playLights(encode);
+                                }
+                            }).start();
+                        }else{
+                            Toast.makeText(MorseLight.this, "Unable to detect your flash. Switching back to sound.", Toast.LENGTH_LONG).show();
+                            switch1.setChecked(false);
+                        }
                     } else {
                         new Thread(new Runnable() {
                             public void run() {
@@ -210,16 +217,18 @@ public class MorseLight extends ActionBarActivity {
     public void playLights(String text) {
         for (int i = 0; i < text.length(); i++)
         {
+            long startTime = Calendar.getInstance().getTimeInMillis();
             if (text.charAt(i) == '.')
             {
                 try {
                     parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
                     camera.setParameters(parameters);
                     camera.startPreview();
-                    Thread.sleep(250, 0);
+                    Thread.sleep(350, 0);
                     parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
                     camera.setParameters(parameters);
                     camera.stopPreview();
+                    SystemClock.sleep(700);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -235,6 +244,7 @@ public class MorseLight extends ActionBarActivity {
                     parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
                     camera.setParameters(parameters);
                     camera.stopPreview();
+                    SystemClock.sleep(700);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -250,7 +260,10 @@ public class MorseLight extends ActionBarActivity {
             else if (text.charAt(i) == ' ')
             {
                 SystemClock.sleep(300);
+                Log.d("morse", "flash: white space");
             }
+            long duration = Calendar.getInstance().getTimeInMillis() - startTime;
+            Log.d("morse", "flash: this char time " + duration);
         }
     }
 
@@ -333,22 +346,25 @@ public class MorseLight extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_help) {
             Intent intent = new Intent(MorseLight.this, Help.class);
+            intent.putExtra("backButton", "main");
             startActivity(intent);
         } else if (id == R.id.action_about) {
             Intent intent = new Intent(MorseLight.this, About.class);
+            intent.putExtra("backButton", "main");
             startActivity(intent);
         } else if (id == R.id.decode_setting) {
-            if (light) {
+            boolean testing = false;
+            if (testing) {
                 if (camera != null) {
                     camera.release();
                     camera = null;
                 }
                 Intent intent = new Intent(MorseLight.this, LightActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(MorseLight.this, AudioActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
             }
         }
