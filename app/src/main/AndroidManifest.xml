@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="teamname.morselight" >
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher2"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MorseLight"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden"
+			android:screenOrientation="portrait">
         </activity>
 
         <meta-data
@@ -26,11 +29,50 @@
             android:value=""
             />
         <activity
-            android:name=".AudioActivity"
-            android:label="@string/title_activity_audio" >
-        </activity>
+            android:name=".SplashActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AudioActivity"
+            android:label="@string/title_activity_audio"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".LightActivity"
+            android:label="@string/title_activity_light"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".Help"
+            android:label="@string/action_help"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".About"
+            android:label="@string/action_about"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".Help1"
+            android:label="@string/title_activity_help1"
+            android:screenOrientation="portrait">
+            </activity>
+        <activity
+            android:name=".Help2"
+            android:label="@string/title_activity_help2"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".Help3"
+            android:label="@string/title_activity_help3"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 </manifest>

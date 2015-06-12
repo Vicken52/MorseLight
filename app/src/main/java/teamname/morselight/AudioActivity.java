@@ -3,6 +3,7 @@ http://developer.android.com/guide/topics/media/audio-capture.html
  */
 package teamname.morselight;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -114,12 +115,24 @@ public class AudioActivity extends ActionBarActivity {
             dispatcher.addAudioProcessor(p);
             new Thread(dispatcher, "Audio Dispatcher").start();
         }else{
-            isDetecting = false;
-            detectButton.setText("START DETECTING");
-            if (dispatcher != null) {
-                dispatcher.removeAudioProcessor(p);
-                dispatcher.stop();  // this will stop audio processing
-            }
+            stopAudioProcess();
+        }
+    }
+
+    // stop current audio process
+    public void stopAudioProcess(){
+        isDetecting = false;
+        detectButton.setText("START DETECTING");
+        if (dispatcher != null) {
+            dispatcher.removeAudioProcessor(p);
+            dispatcher.stop();  // this will stop audio processing
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isDetecting){
+            stopAudioProcess();
         }
     }
 
@@ -175,8 +188,16 @@ public class AudioActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_help_audio) {
+            Intent intent = new Intent(AudioActivity.this, Help.class);
+            startActivity(intent);
+        } else if (id == R.id.action_about_audio) {
+            Intent intent = new Intent(AudioActivity.this, About.class);
+            startActivity(intent);
+        } else if (id == R.id.encode_setting_audio){
+            Intent intent = new Intent(AudioActivity.this, MorseLight.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
