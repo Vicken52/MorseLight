@@ -34,7 +34,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="Developer: Team Name"
+        android:text="Developer: TeamName"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
 
