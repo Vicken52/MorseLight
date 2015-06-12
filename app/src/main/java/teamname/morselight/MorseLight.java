@@ -98,7 +98,7 @@ public class MorseLight extends ActionBarActivity {
         isDialogShowed = false;
         if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
         {
-            Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Flash Detected!!", Toast.LENGTH_LONG).show();
             try {
                 camera = Camera.open();
                 parameters = camera.getParameters();
@@ -108,7 +108,7 @@ public class MorseLight extends ActionBarActivity {
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "No Flash Detected!!", Toast.LENGTH_LONG).show();
         }
 
         //tg.startTone(ToneGenerator.TONE_PROP_BEEP);
