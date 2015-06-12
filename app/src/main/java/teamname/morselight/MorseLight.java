@@ -31,6 +31,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 
 public class MorseLight extends ActionBarActivity {
     TextWatcher input = null;
@@ -215,16 +217,18 @@ public class MorseLight extends ActionBarActivity {
     public void playLights(String text) {
         for (int i = 0; i < text.length(); i++)
         {
+            long startTime = Calendar.getInstance().getTimeInMillis();
             if (text.charAt(i) == '.')
             {
                 try {
                     parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
                     camera.setParameters(parameters);
                     camera.startPreview();
-                    Thread.sleep(250, 0);
+                    Thread.sleep(350, 0);
                     parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
                     camera.setParameters(parameters);
                     camera.stopPreview();
+                    SystemClock.sleep(700);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -240,6 +244,7 @@ public class MorseLight extends ActionBarActivity {
                     parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
                     camera.setParameters(parameters);
                     camera.stopPreview();
+                    SystemClock.sleep(700);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -255,7 +260,10 @@ public class MorseLight extends ActionBarActivity {
             else if (text.charAt(i) == ' ')
             {
                 SystemClock.sleep(300);
+                Log.d("morse", "flash: white space");
             }
+            long duration = Calendar.getInstance().getTimeInMillis() - startTime;
+            Log.d("morse", "flash: this char time " + duration);
         }
     }
 
